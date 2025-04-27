@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import site.tradelink.tradelink.oauth2.service.CustomOAuth2UserService;
-import site.tradelink.tradelink.oauth2.util.CustomAuthorityMapper;
+import site.tradelink.tradelink.oauth2.common.util.CustomAuthorityMapper;
 
 @EnableWebSecurity
 @Configuration
