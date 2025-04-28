@@ -1,17 +1,20 @@
 package site.tradelink.tradelink.oauth2.dto;
 
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GoogleUser extends OAuth2ProviderUser {
-    public GoogleUser(ClientRegistration clientRegistration, OAuth2User oAuth2User) {
-        super(clientRegistration, (ConcurrentHashMap<String, Object>) oAuth2User.getAttributes());
+
+    public GoogleUser(ClientRegistration clientRegistration, Attributes attributes) {
+        super(clientRegistration, attributes.getMainAttributes());
     }
 
     @Override
     public String getId() {
         return (String) getAttributes().get("sub");
+    }
+
+    @Override
+    public String getUsername() {
+        return (String) getAttributes().get("name");
     }
 }

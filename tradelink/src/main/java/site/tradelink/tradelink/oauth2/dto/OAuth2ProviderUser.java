@@ -3,14 +3,17 @@ package site.tradelink.tradelink.oauth2.dto;
 import lombok.Getter;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 @Getter
 public abstract class OAuth2ProviderUser implements ProviderUser{
-    private ClientRegistration clientRegistration;
-    private ConcurrentHashMap<String, Object> attributes;
 
-    public OAuth2ProviderUser(ClientRegistration clientRegistration, ConcurrentHashMap<String, Object> attributes) {
+    private ClientRegistration clientRegistration;
+    // ProviderUserConverter 객체가 호출될 때마다 새로운 attributes 객체를 생성하고 있기에
+    // ConcurrentHashMap에서 HashMap으로 바꿈.
+    private Map<String, Object> attributes;
+
+    public OAuth2ProviderUser(ClientRegistration clientRegistration, Map<String, Object> attributes) {
         this.clientRegistration = clientRegistration;
         this.attributes = attributes;
     }
@@ -23,10 +26,5 @@ public abstract class OAuth2ProviderUser implements ProviderUser{
     @Override
     public String getProvider() {
         return clientRegistration.getRegistrationId();
-    }
-
-    @Override
-    public String getUsername() {
-        return getEmail().substring(0, getEmail().indexOf("@"));
     }
 }
