@@ -3,6 +3,7 @@ package site.tradelink.tradelink.oauth2.common.converters;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import site.tradelink.tradelink.oauth2.common.enums.SocialType;
+import site.tradelink.tradelink.oauth2.common.util.OAuth2Utils;
 import site.tradelink.tradelink.oauth2.dto.GoogleUser;
 import site.tradelink.tradelink.oauth2.dto.ProviderUser;
 
@@ -14,6 +15,6 @@ public class OAuth2GoogleProviderUserConverter implements ProviderUserConverter<
             return null;
         }
 
-        return new GoogleUser(clientRegistration, oAuth2User);
+        return new GoogleUser(clientRegistration, OAuth2Utils.getMainAttributes(oAuth2User));
     }
 }

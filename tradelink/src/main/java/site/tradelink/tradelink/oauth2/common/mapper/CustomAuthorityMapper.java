@@ -1,4 +1,4 @@
-package site.tradelink.tradelink.oauth2.common.util;
+package site.tradelink.tradelink.oauth2.common.mapper;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
