@@ -23,15 +23,18 @@ public class CustomAuthorityMapper implements GrantedAuthoritiesMapper {
     }
 
     private GrantedAuthority mapAuthority(String name) {
-        if (name.lastIndexOf(".") > 0) {
-            int index = name.lastIndexOf(".");
-            name = "SCOPE_" + name.substring(index+1);
-        }
+        if (name.startsWith("OAUTH")) {
+            if (name.lastIndexOf("_") > 0) {
+                int index = name.lastIndexOf("_");
+                name = name.substring(index+1);
+            }
 
-        if (this.prefix.length() > 0 && !name.startsWith(this.prefix)) {
-            name = this.prefix + name;
-        }
+            if (!name.startsWith(this.prefix)) {
+                name = this.prefix + name;
+            }
 
-        return new SimpleGrantedAuthority(name);
+            return new SimpleGrantedAuthority(name);
+        }
+        return new SimpleGrantedAuthority("anonymousUser");
     }
 }
