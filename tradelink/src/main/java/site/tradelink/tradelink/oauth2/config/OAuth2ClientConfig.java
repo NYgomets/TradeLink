@@ -23,7 +23,7 @@ public class OAuth2ClientConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/v1/api/**").access(new WebExpressionAuthorizationManager("hasAnyRole('SCOPE_profile', 'SCOPE_email')"))
+                        .requestMatchers("/v1/api/**").access(new WebExpressionAuthorizationManager("hasAnyRole('USER')"))
                         .anyRequest().permitAll()
                 );
 
