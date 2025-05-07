@@ -8,6 +8,7 @@ import site.tradelink.tradelink.oauth2.dto.NaverUser;
 import site.tradelink.tradelink.oauth2.dto.ProviderUser;
 
 public class OAuth2NaverProviderUserConverter implements ProviderUserConverter<ClientRegistration, OAuth2User, ProviderUser> {
+
     @Override
     public ProviderUser convert(ClientRegistration clientRegistration, OAuth2User oAuth2User) {
 
