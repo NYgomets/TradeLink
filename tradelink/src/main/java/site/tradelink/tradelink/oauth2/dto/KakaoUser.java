@@ -6,16 +6,18 @@ import java.util.Map;
 
 public class KakaoUser extends OAuth2ProviderUser {
 
+    private final Map<String, Object> mainAttributes;
     private final Map<String, Object> otherAttributes;
 
     public KakaoUser(ClientRegistration clientRegistration, Attributes attributes) {
         super(clientRegistration, attributes.getSubAttributes());
+        this.mainAttributes = attributes.getMainAttributes();
         this.otherAttributes = attributes.getOtherAttributes();
     }
 
     @Override
     public String getId() {
-        return (String)getAttributes().get("id");
+        return String.valueOf(mainAttributes.get("id"));
     }
 
     @Override

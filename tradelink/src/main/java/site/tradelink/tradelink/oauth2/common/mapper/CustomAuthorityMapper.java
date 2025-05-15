@@ -23,7 +23,7 @@ public class CustomAuthorityMapper implements GrantedAuthoritiesMapper {
     }
 
     private GrantedAuthority mapAuthority(String name) {
-        if (name.startsWith("OAUTH")) {
+        if (name.startsWith("OAUTH") || name.startsWith("OIDC")) {
             if (name.lastIndexOf("_") > 0) {
                 int index = name.lastIndexOf("_");
                 name = name.substring(index+1);
