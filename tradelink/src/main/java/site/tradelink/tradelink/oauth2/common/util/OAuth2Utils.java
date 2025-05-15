@@ -24,6 +24,7 @@ public class OAuth2Utils {
         Map<String, Object> subAttributes= (Map<String, Object>) oAuth2User.getAttributes().get(subAttributesKey);
         Map<String, Object> otherAttributes = (Map<String, Object>) subAttributes.get(otherAttributesKey);
         return Attributes.builder()
+                .mainAttributes(oAuth2User.getAttributes())
                 .subAttributes(subAttributes)
                 .otherAttributes(otherAttributes)
                 .build();
