@@ -23,7 +23,7 @@ public abstract class AbstractOAuth2UserService {
         this.providerUserConverter = providerUserConverter;
     }
 
-    // coverter를 사용하여 ProviderUser 객체 반환
+    // converter를 사용하여 ProviderUser 객체 반환
     protected ProviderUser providerUser(ClientRegistration clientRegistration, OAuth2User oAuth2User) {
         return providerUserConverter.convert(clientRegistration, oAuth2User);
     }
