@@ -1,18 +1,13 @@
 package site.tradelink.tradelink.oauth2.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Entity
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor (access = AccessLevel.PROTECTED)
 public class Member {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seq;
