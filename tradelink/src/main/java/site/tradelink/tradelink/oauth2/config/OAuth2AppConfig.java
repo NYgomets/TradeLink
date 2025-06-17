@@ -21,13 +21,11 @@ public class OAuth2AppConfig {
         return new CustomAuthorityMapper();
     }
 
-
     // client-authentication-method가 none이 아니어도 PKCE를 도입하기 위해 설정
     @Bean
     public OAuth2AuthorizationRequestResolver customAuthorizationRequestResolver() {
         return new CustomOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization");
     }
-
 
     // 키움 증권 OAuth2 Client_Credentials를 위한 AuthorizedClientManager 설정 (OAuth2LoginAuthenticationFilter는 authorization_code 방식으로 사용불가)
     @Bean
