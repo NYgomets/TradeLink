@@ -7,9 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor (access = AccessLevel.PROTECTED)
+@AllArgsConstructor (access = AccessLevel.PRIVATE)
 public class Member {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column (name = "member_seq")
     private Long seq;
 
     @Column(unique = true, nullable = false)
