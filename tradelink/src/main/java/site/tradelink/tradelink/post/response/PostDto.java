@@ -21,7 +21,7 @@ public class PostDto {
     private String content;
     private List<CommentDto> comments;
     private List<UploadFileDto> uploadFiles;
-    private String name;
+    private String authorName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy년 MM월 dd일 HH시 mm분 ss초", timezone = "Asia/Seoul")
     private LocalDateTime createTime;
 
@@ -41,7 +41,7 @@ public class PostDto {
                 uploadFiles.stream()
                         .map(UploadFileDto::new)
                         .collect(Collectors.toList());
-        this.name = post.getMember().getMemberName();
+        this.authorName = post.getMember().getMemberName();
         this.createTime = post.getCreateTime();
     }
 }
