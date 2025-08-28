@@ -28,11 +28,9 @@ public abstract class AbstractOAuth2UserService {
         return providerUserConverter.convert(clientRegistration, oAuth2User);
     }
 
-    protected void register(ProviderUser providerUser) {
+    protected Member register(ProviderUser providerUser) {
         Optional<Member> member = memberRepository.findByMemberId(providerUser.getId());
 
-        if(member.isEmpty()) {
-            memberService.register(providerUser);
-        }
+        return member.orElseGet(() -> memberService.register(providerUser));
     }
 }

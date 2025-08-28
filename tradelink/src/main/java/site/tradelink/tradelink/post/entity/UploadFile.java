@@ -15,7 +15,7 @@ public class UploadFile extends BaseEntity {
     @Column(name = "uploadFile_seq")
     private Long seq;
 
-    private String saveFileName;
+    private String s3Key;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_seq")

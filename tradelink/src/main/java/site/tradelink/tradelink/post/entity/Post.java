@@ -5,6 +5,9 @@ import lombok.*;
 import site.tradelink.tradelink.common.entity.BaseEntity;
 import site.tradelink.tradelink.oauth2.entity.Member;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Builder
 @Getter
@@ -23,6 +26,13 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_seq")
     private Member member;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UploadFile> uploadFiles = new ArrayList<>();
+
+    public void attachFiles(List<UploadFile> files) {
+        uploadFiles = files;
+    }
 
     public void change(String title, String content) {
         this.title = title;
