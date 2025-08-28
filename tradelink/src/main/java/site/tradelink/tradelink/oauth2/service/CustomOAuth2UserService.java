@@ -8,7 +8,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import site.tradelink.tradelink.oauth2.common.converters.ProviderUserConverter;
+import site.tradelink.tradelink.oauth2.common.principal.CustomOAuth2User;
 import site.tradelink.tradelink.oauth2.dto.ProviderUser;
+import site.tradelink.tradelink.oauth2.entity.Member;
 import site.tradelink.tradelink.oauth2.repository.MemberRepository;
 
 @Service
@@ -29,8 +31,8 @@ public class CustomOAuth2UserService extends AbstractOAuth2UserService implement
         ProviderUser providerUser = super.providerUser(clientRegistration, oAuth2User);
 
         // 회원가입하기
-        super.register(providerUser);
+        Member member = super.register(providerUser);
 
-        return oAuth2User;
+        return new CustomOAuth2User(member.getSeq(), oAuth2User.getAttributes(), oAuth2User.getAuthorities(), oAuth2User.getName(), null, null);
     }
 }

@@ -1,4 +1,4 @@
-package site.tradelink.tradelink.post.util;
+package site.tradelink.tradelink.post.common.util;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

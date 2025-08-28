@@ -2,17 +2,19 @@ package site.tradelink.tradelink.oauth2.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.oauth2.dto.ProviderUser;
 import site.tradelink.tradelink.oauth2.entity.Member;
 import site.tradelink.tradelink.oauth2.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public void register(ProviderUser providerUser) {
+    public Member register(ProviderUser providerUser) {
         Member member = Member.builder()
                 .memberId(providerUser.getId())
                 .memberName(providerUser.getUsername())
@@ -20,6 +22,6 @@ public class MemberService {
                 .email(providerUser.getEmail())
                 .build();
 
-        memberRepository.save(member);
+        return memberRepository.save(member);
     }
 }

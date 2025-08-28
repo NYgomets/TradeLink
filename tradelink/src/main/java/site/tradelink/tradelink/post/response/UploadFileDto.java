@@ -12,6 +12,6 @@ public class UploadFileDto {
 
     public UploadFileDto(UploadFile uploadFile) {
         this.seq = uploadFile.getSeq();
-        this.savedFileName = uploadFile.getSaveFileName();
+        this.savedFileName = uploadFile.getS3Key();
     }
 }

@@ -9,7 +9,9 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import site.tradelink.tradelink.oauth2.common.converters.ProviderUserConverter;
+import site.tradelink.tradelink.oauth2.common.principal.CustomOAuth2User;
 import site.tradelink.tradelink.oauth2.dto.ProviderUser;
+import site.tradelink.tradelink.oauth2.entity.Member;
 import site.tradelink.tradelink.oauth2.repository.MemberRepository;
 
 @Service
@@ -38,8 +40,8 @@ public class CustomOidcUserService extends AbstractOAuth2UserService implements 
 
         ProviderUser providerUser = super.providerUser(clientRegistration, oidcUser);
 
-        super.register(providerUser);
+        Member member = super.register(providerUser);
 
-        return oidcUser;
+        return new CustomOAuth2User(member.getSeq(), oidcUser.getAttributes(), oidcUser.getAuthorities(), oidcUser.getName(), oidcUser.getUserInfo(), oidcUser.getIdToken());
     }
 }
