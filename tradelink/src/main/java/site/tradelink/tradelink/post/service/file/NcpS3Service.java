@@ -3,7 +3,6 @@ package site.tradelink.tradelink.post.service.file;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
@@ -19,9 +18,9 @@ public class NcpS3Service {
     @Value("${cloud.ncp.s3.bucket}")
     private String bucket;
 
-    public void deleteFiles(List<String> s3Keys) {
+    public Map<String, String> deleteFiles(List<String> s3Keys) {
         if (s3Keys == null || s3Keys.isEmpty()) {
-            return;
+            return Collections.emptyMap();
         }
 
         List<String> sanitizedKeys = s3Keys.stream()
@@ -30,13 +29,13 @@ public class NcpS3Service {
                 .distinct()
                 .toList();
 
-        if (sanitizedKeys.isEmpty()) {
-            return;
-        }
-
         List<ObjectIdentifier> toDelete = sanitizedKeys.stream()
                 .map(key -> ObjectIdentifier.builder().key(key).build())
                 .collect(Collectors.toList());
+
+        if (toDelete.isEmpty()) {
+            return Collections.emptyMap();
+        }
 
         DeleteObjectsRequest deleteReq = DeleteObjectsRequest.builder()
                 .bucket(bucket)
@@ -46,27 +45,31 @@ public class NcpS3Service {
                         .build())
                 .build();
 
-        List<String> successKeys = new ArrayList<>();
         Map<String, String> failureKeys = new HashMap<>();
 
         try {
             DeleteObjectsResponse response = s3Client.deleteObjects(deleteReq);
 
-            if (response.hasDeleted()) {
-                response.deleted().forEach(delete -> successKeys.add(delete.key()));
-            }
-
             if (response.hasErrors()) {
                 response.errors().forEach(error -> failureKeys.put(error.key(), error.code() + ": " + error.message()));
             }
-        } catch (S3Exception | SdkClientException e) {
-            sanitizedKeys.forEach(key -> failureKeys.put(key, e.getClass().getSimpleName() + ": " + e.getMessage()));
+        } catch (S3Exception e) {
+            sanitizedKeys.forEach(key -> failureKeys.put(key, e.awsErrorDetails().errorMessage()));
         }
 
-        // 추후 Error 처리 작업 필요
-        if (!failureKeys.isEmpty()) {
-//            throw new S3CleanupException(successKeys, failureKeys);
-            throw new IllegalArgumentException("S3 처리가 실패하였습니다.");
+        return failureKeys;
+    }
+
+    public List<S3Object> listAllObjectsByPrefix(String prefix) {
+        try {
+            ListObjectsV2Request listReq = ListObjectsV2Request.builder()
+                    .bucket(bucket)
+                    .prefix(prefix)
+                    .build();
+
+            return s3Client.listObjectsV2(listReq).contents();
+        } catch (S3Exception e) {
+            return Collections.emptyList();
         }
     }
 }
