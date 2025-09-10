@@ -3,6 +3,9 @@ package site.tradelink.tradelink.post.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import site.tradelink.tradelink.common.entity.BaseEntity;
+import site.tradelink.tradelink.post.common.enums.FileStatus;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -17,7 +20,21 @@ public class UploadFile extends BaseEntity {
 
     private String s3Key;
 
+    @Enumerated(EnumType.STRING)
+    private FileStatus status = FileStatus.ACTIVE;
+
+    private LocalDateTime deletedTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_seq")
     private Post post;
+
+    protected void linkToPost(Post post) {
+        this.post = post;
+    }
+
+    public void softDelete() {
+        this.status = FileStatus.DELETED;
+        deletedTime = LocalDateTime.now();
+    }
 }

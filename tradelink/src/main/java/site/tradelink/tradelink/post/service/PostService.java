@@ -4,18 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import site.tradelink.tradelink.post.common.enums.AllowedImageContentType;
 import site.tradelink.tradelink.post.request.PostCreateDto;
+import site.tradelink.tradelink.post.request.PostUpdateDto;
+import site.tradelink.tradelink.post.response.PostResponseDto;
 import site.tradelink.tradelink.post.response.PreSignedUrlDto;
 import site.tradelink.tradelink.post.service.file.FileUrlService;
-import site.tradelink.tradelink.post.service.file.NcpS3Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostTransactionalService transactionalService;
     private final FileUrlService fileUrlService;
-    private final NcpS3Service ncpS3Service;
 
     /**
      * [1단계] 게시글 파일 업로드를 위한 Pre-signed URL을 발급
@@ -36,15 +34,19 @@ public class PostService {
      * [2단계] Client가 S3에 파일 업로드를 완료한 후, 게시글 생성을 최종 확정
      * Controller로부터 인증된 사용자의 Seq(memberSeq)를 받아 사용 (세션에 저장되어 있음)
      */
-    public void createPost(PostCreateDto request, Long memberSeq) {
-        transactionalService.createPostAndMetadata(request, memberSeq);
+    public Long createPost(PostCreateDto request, Long memberSeq) {
+        return transactionalService.createPostAndMetadata(request, memberSeq);
+    }
+
+    public PostResponseDto getPost(Long postSeq) {
+        return transactionalService.getPostDetails(postSeq);
+    }
+
+    public void updatePost(Long postSeq, Long memberSeq, PostUpdateDto updateDto) {
+        transactionalService.updatePost(postSeq, memberSeq, updateDto);
     }
 
     public void deletePost(Long postSeq, Long memberSeq) {
-        List<String> s3KeysToDelete = transactionalService.deletePostAndGetS3Keys(postSeq, memberSeq);
-
-        if (s3KeysToDelete != null && !s3KeysToDelete.isEmpty()) {
-            ncpS3Service.deleteFiles(s3KeysToDelete);
-        }
+        transactionalService.softDeletePost(postSeq, memberSeq);
     }
 }

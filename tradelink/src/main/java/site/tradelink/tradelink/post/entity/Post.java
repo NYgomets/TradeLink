@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import site.tradelink.tradelink.common.entity.BaseEntity;
 import site.tradelink.tradelink.oauth2.entity.Member;
+import site.tradelink.tradelink.post.common.enums.PostStatus;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,8 @@ public class Post extends BaseEntity {
 
     private String content;
 
+    private LocalDateTime deletedTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_seq")
     private Member member;
@@ -30,12 +34,25 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UploadFile> uploadFiles = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private PostStatus status = PostStatus.ACTIVE;
+
     public void attachFiles(List<UploadFile> files) {
-        uploadFiles = files;
+        files.forEach(this::addUploadFile);
     }
 
-    public void change(String title, String content) {
+    public void update(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public void addUploadFile(UploadFile file) {
+        this.uploadFiles.add(file);
+        file.linkToPost(this);
+    }
+
+    public void softDelete() {
+        this.status = PostStatus.DELETED;
+        this.deletedTime = LocalDateTime.now();
     }
 }
