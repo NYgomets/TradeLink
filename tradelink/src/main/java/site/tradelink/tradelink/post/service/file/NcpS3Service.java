@@ -3,6 +3,7 @@ package site.tradelink.tradelink.post.service.file;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import site.tradelink.tradelink.post.common.exception.S3DeletionException;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
@@ -19,9 +20,9 @@ public class NcpS3Service {
     @Value("${cloud.ncp.s3.bucket}")
     private String bucket;
 
-    public Map<String, String> deleteFiles(List<String> s3Keys) {
+    public void deleteFiles(List<String> s3Keys) {
         if (s3Keys == null || s3Keys.isEmpty()) {
-            return Collections.emptyMap();
+            return;
         }
 
         List<String> sanitizedKeys = s3Keys.stream()
@@ -35,7 +36,7 @@ public class NcpS3Service {
                 .collect(Collectors.toList());
 
         if (toDelete.isEmpty()) {
-            return Collections.emptyMap();
+            return;
         }
 
         DeleteObjectsRequest deleteReq = DeleteObjectsRequest.builder()
@@ -58,7 +59,9 @@ public class NcpS3Service {
             sanitizedKeys.forEach(key -> failureKeys.put(key, e.awsErrorDetails().errorMessage()));
         }
 
-        return failureKeys;
+        if (!failureKeys.isEmpty()) {
+            throw new S3DeletionException("S3 파일 삭제 중 일부 또는 전체 실패", failureKeys);
+        }
     }
 
     /**

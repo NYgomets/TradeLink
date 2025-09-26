@@ -2,8 +2,11 @@ package site.tradelink.tradelink.post.common.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import site.tradelink.tradelink.post.common.event.S3DeletionFailureEvent;
+import site.tradelink.tradelink.post.common.exception.S3DeletionException;
 import site.tradelink.tradelink.post.service.file.NcpS3Service;
 import software.amazon.awssdk.services.s3.model.S3Object;
 import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
@@ -21,6 +24,7 @@ public class FileDeletionScheduler {
 
     private final NcpS3Service ncpS3Service;
     private final FileDeletionTransactionalService fileDeletionTransactionalService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${cloud.ncp.s3.path.postPhoto}")
     private String postPhotoPath;
@@ -32,7 +36,11 @@ public class FileDeletionScheduler {
         List<String> s3KeysToPurge = fileDeletionTransactionalService.findAndPurgeSoftDeletedPosts();
 
         if (!s3KeysToPurge.isEmpty()) {
-            ncpS3Service.deleteFiles(s3KeysToPurge);
+            try {
+                ncpS3Service.deleteFiles(s3KeysToPurge);
+            } catch (S3DeletionException e) {
+                eventPublisher.publishEvent(new S3DeletionFailureEvent(e.getFailures()));
+            }
         }
     }
 
@@ -41,7 +49,11 @@ public class FileDeletionScheduler {
         List<String> s3KeysToPurge = fileDeletionTransactionalService.findAndPurgeSoftDeletedIndividualFiles();
 
         if (!s3KeysToPurge.isEmpty()) {
-            ncpS3Service.deleteFiles(s3KeysToPurge);
+            try {
+                ncpS3Service.deleteFiles(s3KeysToPurge);
+            } catch (S3DeletionException e) {
+                eventPublisher.publishEvent(new S3DeletionFailureEvent(e.getFailures()));
+            }
         }
     }
 
@@ -75,8 +87,12 @@ public class FileDeletionScheduler {
                 // S3 벌크 삭제 제한(1000개)에 맞춰 분할 삭제
                 for (int i=0; i< orphanKeysInPage.size(); i += S3_BULK_DELETE_LIMIT) {
                     List<String> subList = orphanKeysInPage.subList(i, Math.min(i + S3_BULK_DELETE_LIMIT, orphanKeysInPage.size()));
-                    ncpS3Service.deleteFiles(subList);
 
+                    try {
+                        ncpS3Service.deleteFiles(subList);
+                    } catch (S3DeletionException e) {
+                        eventPublisher.publishEvent(new S3DeletionFailureEvent(e.getFailures()));
+                    }
                 }
             }
         });
