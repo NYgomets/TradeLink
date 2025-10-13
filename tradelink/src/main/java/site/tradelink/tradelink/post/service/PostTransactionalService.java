@@ -31,7 +31,7 @@ public class PostTransactionalService {
     @Transactional
     public Long createPostAndMetadata(PostCreateDto request, Long memberSeq) {
         // 추후 Error 작업 추가
-        Member member = memberRepository.findBySeq(memberSeq)
+        Member member = memberRepository.findById(memberSeq)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Post post = Post.builder()
