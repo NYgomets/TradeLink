@@ -12,6 +12,7 @@ import site.tradelink.tradelink.oauth2.repository.MemberRepository;
 import site.tradelink.tradelink.post.entity.Post;
 import site.tradelink.tradelink.post.repository.PostRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -68,5 +69,14 @@ public class CommentTransactionalService {
     @Transactional(readOnly = true)
     public List<Comment> getCommentsByPostSeq(Long postSeq) {
         return commentRepository.findAllByPostSeq(postSeq);
+    }
+
+    @Transactional
+    public void purgeOldSoftDeletedComments(LocalDateTime cutoffDate) {
+        List<Comment> commentsToPurge = commentRepository.findPurgableComments(cutoffDate);
+
+        if (!commentsToPurge.isEmpty()) {
+            commentRepository.deleteAllInBatch(commentsToPurge);
+        }
     }
 }
