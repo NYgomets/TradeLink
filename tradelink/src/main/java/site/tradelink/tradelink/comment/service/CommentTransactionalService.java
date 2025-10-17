@@ -22,8 +22,6 @@ public class CommentTransactionalService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    private static final int MAX_DEPTH = 1;
-
     @Transactional
     public Long createComment(Long postSeq, Long memberSeq, CommentCreateDto request) {
         // 추후 Error 작업 추가
@@ -41,7 +39,7 @@ public class CommentTransactionalService {
             if (clickedParentComment.getDepth() == 0) {
                 actualParentComment = clickedParentComment;
             } else {
-                actualParentComment = clickedParentComment;
+                actualParentComment = clickedParentComment.getParent();
             }
         }
 

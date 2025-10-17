@@ -2,9 +2,16 @@ package site.tradelink.tradelink.comment.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import site.tradelink.tradelink.comment.entity.Comment;
 import site.tradelink.tradelink.comment.request.CommentCreateDto;
 import site.tradelink.tradelink.comment.request.CommentUpdateDto;
 import site.tradelink.tradelink.comment.response.CommentResponseDto;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,5 +31,32 @@ public class CommentService {
         transactionalService.deleteComment(commentSeq, memberSeq);
     }
 
-    public List<CommentResponseDto>
+    public List<CommentResponseDto> getCommentsForPost(Long postSeq) {
+        List<Comment> comments = transactionalService.getCommentsByPostSeq(postSeq);
+
+        LinkedHashMap<Long, CommentResponseDto> dtoMap = comments.stream()
+                .map(CommentResponseDto::from)
+                .collect(Collectors.toMap(
+                        CommentResponseDto::commentSeq,
+                        dto -> dto,
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
+
+        List<CommentResponseDto> rootComments = new ArrayList<>();
+
+        comments.forEach(comment -> {
+            CommentResponseDto currentDto = dtoMap.get(comment.getSeq());
+            if (comment.getParent() != null) {
+                CommentResponseDto parentDto = dtoMap.get(comment.getParent().getSeq());
+                if (parentDto != null) {
+                    parentDto.replies().add(currentDto);
+                }
+            } else {
+                rootComments.add(currentDto);
+            }
+        });
+
+        return Collections.unmodifiableList(rootComments);
+    }
 }
