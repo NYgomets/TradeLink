@@ -13,8 +13,4 @@ import java.util.Optional;
 @Repository
 public interface ProcessorOffsetRepository extends JpaRepository<ProcessorOffset, Long> {
     Optional<ProcessorOffset> findByProcessorName(String processorName);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT po FROM ProcessorOffset po WHERE po.processorName = :processorName")
-    Optional<ProcessorOffset> findByProcessorNameWithLock(@Param("processorName") String processorName);
 }
