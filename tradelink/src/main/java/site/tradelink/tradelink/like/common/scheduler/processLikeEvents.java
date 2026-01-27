@@ -15,6 +15,7 @@ import site.tradelink.tradelink.like.repository.LikePostEventRepository;
 import site.tradelink.tradelink.like.repository.LikeStatusRepository;
 import site.tradelink.tradelink.like.repository.PostStatsRepository;
 import site.tradelink.tradelink.like.repository.ProcessorOffsetRepository;
+import site.tradelink.tradelink.like.service.LikeEventProcessor;
 import site.tradelink.tradelink.like.service.failed.LikeEventDLQService;
 
 import java.util.ArrayList;
@@ -27,9 +28,9 @@ import java.util.Map;
 public class processLikeEvents {
 
     private final LikeEventDLQService likeEventDLQService;
+    private final LikeEventProcessor likeEventProcessor;
 
     private final LikePostEventRepository likePostEventRepository;
-    private final LikeStatusRepository likeStatusRepository;
     private final PostStatsRepository postStatsRepository;
     private final ProcessorOffsetRepository processorOffsetRepository;
 
@@ -104,7 +105,7 @@ public class processLikeEvents {
 
         for (LikePostEvent event : events) {
             try {
-                boolean statusChanged = processSingleLikeStatus(event);
+                boolean statusChanged = likeEventProcessor.processSingleLikeStatus(event);
 
                 if (statusChanged) {
                     long delta = (event.getActionType() == ActionType.LIKE) ? 1L : -1L;
@@ -135,24 +136,6 @@ public class processLikeEvents {
                 .skippedCount(skippedCount)
                 .failedCount(failedCount)
                 .build();
-    }
-
-    private boolean processSingleLikeStatus(LikePostEvent event) {
-        LikeStatus likeStatus = likeStatusRepository.findByMemberSeqAndPostSeq(event.getMemberSeq(), event.getPostSeq())
-                .orElseGet(() -> likeStatusRepository.save(LikeStatus.builder()
-                        .memberSeq(event.getMemberSeq())
-                        .postSeq(event.getPostSeq())
-                        .isLiked(false)
-                        .build()));
-
-        boolean isLikedAction = event.getActionType() == ActionType.LIKE;
-
-        if (likeStatus.getIsLiked().equals(isLikedAction)) {
-            return false;
-        }
-
-        likeStatus.updateLikeStatus(isLikedAction);
-        return true;
     }
 
     private ProcessorOffset getOrInitOffset() {
