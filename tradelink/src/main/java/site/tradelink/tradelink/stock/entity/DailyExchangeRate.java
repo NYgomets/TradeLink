@@ -1,0 +1,41 @@
+package site.tradelink.tradelink.stock.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import site.tradelink.tradelink.common.entity.BaseEntity;
+
+import java.time.LocalDate;
+
+/**
+ * 일별 최종 환율
+ */
+@Entity
+@Builder
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class DailyExchangeRate extends BaseEntity {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "dailyExchangeRate_seq")
+    private Long seq;
+
+    @Column
+    private String currencyCode;
+
+    @Column
+    private String currencyName;
+
+    @Column
+    private Double rate;
+
+    @Column
+    private Double changeAmount;
+
+    @Column
+    private Double changePercent;
+
+    @Column
+    private LocalDate baseDate;
+
+}

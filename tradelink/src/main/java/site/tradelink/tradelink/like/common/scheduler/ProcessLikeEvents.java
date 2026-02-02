@@ -8,11 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.like.common.enums.ActionType;
 import site.tradelink.tradelink.like.entity.LikePostEvent;
-import site.tradelink.tradelink.like.entity.LikeStatus;
 import site.tradelink.tradelink.like.entity.PostStats;
 import site.tradelink.tradelink.like.entity.ProcessorOffset;
 import site.tradelink.tradelink.like.repository.LikePostEventRepository;
-import site.tradelink.tradelink.like.repository.LikeStatusRepository;
 import site.tradelink.tradelink.like.repository.PostStatsRepository;
 import site.tradelink.tradelink.like.repository.ProcessorOffsetRepository;
 import site.tradelink.tradelink.like.service.LikeEventProcessor;
@@ -25,7 +23,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class processLikeEvents {
+public class ProcessLikeEvents {
 
     private final LikeEventDLQService likeEventDLQService;
     private final LikeEventProcessor likeEventProcessor;
