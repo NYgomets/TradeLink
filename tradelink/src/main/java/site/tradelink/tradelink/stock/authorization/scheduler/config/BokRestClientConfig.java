@@ -9,6 +9,7 @@ import org.springframework.web.client.RestClient;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Configuration
@@ -28,6 +29,7 @@ public class BokRestClientConfig {
     public RestClient bokRestClient() {
         HttpClient httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_2)
+                .executor(Executors.newVirtualThreadPerTaskExecutor())
                 .connectTimeout(Duration.ofMillis(timeout))
                 .build();
 
