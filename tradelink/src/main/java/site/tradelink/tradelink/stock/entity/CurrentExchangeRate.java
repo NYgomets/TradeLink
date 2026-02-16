@@ -38,11 +38,26 @@ public class CurrentExchangeRate extends BaseEntity {
     @Column
     private LocalDateTime baseDateTime;
 
-    // 변동폭/변동률 계산 메서드
-    public void calculateChange(Double previousRate) {
-        if (previousRate != null && previousRate > 0) {
-            this.changeAmount = this.rate - previousRate;
-            this.changePercent = (this.changeAmount/previousRate) * 100;
+    /**
+     * 환율 업데이트 및 변동폭 계산
+     */
+    public void updateRate(Double newRate, Double previousRate, LocalDateTime newDateTime) {
+        this.rate = newRate;
+        this.baseDateTime = newDateTime;
+        calculateChange(previousRate);
+    }
+
+    /**
+     * 변동폭/변동률 계산
+     */
+    private void calculateChange(Double previousRate) {
+        if (previousRate == null || previousRate <= 0) {
+            this.changePercent = 0.0;
+            this.changeAmount = 0.0;
+            return;
         }
+
+        this.changeAmount = this.rate - previousRate;
+        this.changePercent = (this.changeAmount / previousRate) * 100;
     }
 }
