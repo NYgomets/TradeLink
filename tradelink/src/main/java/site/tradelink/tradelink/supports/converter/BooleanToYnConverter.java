@@ -1,4 +1,4 @@
-package site.tradelink.tradelink.common.converter;
+package site.tradelink.tradelink.supports.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

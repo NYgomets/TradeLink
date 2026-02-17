@@ -1,8 +1,8 @@
-package site.tradelink.tradelink.common.exception;
+package site.tradelink.tradelink.supports.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import site.tradelink.tradelink.common.enums.ErrorCode;
+import site.tradelink.tradelink.supports.enums.ErrorCode;
 
 @Getter
 @RequiredArgsConstructor

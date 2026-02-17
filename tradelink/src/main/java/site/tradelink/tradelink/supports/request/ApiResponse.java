@@ -1,10 +1,10 @@
-package site.tradelink.tradelink.common.request;
+package site.tradelink.tradelink.supports.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
-import site.tradelink.tradelink.common.enums.ErrorCode;
+import site.tradelink.tradelink.supports.enums.ErrorCode;
 
 public record ApiResponse<T> (
 

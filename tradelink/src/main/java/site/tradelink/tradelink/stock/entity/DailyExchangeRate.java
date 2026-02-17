@@ -2,7 +2,7 @@ package site.tradelink.tradelink.stock.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import site.tradelink.tradelink.common.entity.BaseEntity;
+import site.tradelink.tradelink.supports.entity.BaseEntity;
 
 import java.time.LocalDate;
 
