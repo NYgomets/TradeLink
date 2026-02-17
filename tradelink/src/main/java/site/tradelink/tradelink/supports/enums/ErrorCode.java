@@ -1,4 +1,4 @@
-package site.tradelink.tradelink.common.enums;
+package site.tradelink.tradelink.supports.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

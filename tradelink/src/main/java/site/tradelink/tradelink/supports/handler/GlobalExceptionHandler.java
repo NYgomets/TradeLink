@@ -1,13 +1,13 @@
-package site.tradelink.tradelink.common.handler;
+package site.tradelink.tradelink.supports.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import site.tradelink.tradelink.common.enums.ErrorCode;
-import site.tradelink.tradelink.common.exception.CustomException;
-import site.tradelink.tradelink.common.request.ApiResponse;
+import site.tradelink.tradelink.supports.enums.ErrorCode;
+import site.tradelink.tradelink.supports.exception.CustomException;
+import site.tradelink.tradelink.supports.request.ApiResponse;
 
 @Slf4j
 @RestControllerAdvice

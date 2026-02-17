@@ -56,7 +56,7 @@ public class ExchangeRateService {
      * 임계값 1일: 1일은 당일 00시 부터 상세 로그, 그 외는 일별 종가 테이블 조회
      */
     @Transactional(readOnly = true)
-    public List<?> getChartExchangeRates(String currencyCode, String period) {
+    public List<ExchangeRateChartPointDto> getChartExchangeRates(String currencyCode, String period) {
 
         int days = parsePeriod(period);
 
@@ -84,7 +84,7 @@ public class ExchangeRateService {
 
             return dailyRepository.findByCurrencyCodeAndBaseDateBetweenOrderByBaseDateAsc(currencyCode, start, end)
                     .stream()
-                    .map(ExchangeRateSummaryDto::fromDaily)
+                    .map(ExchangeRateChartPointDto::fromDaily)
                     .toList();
         }
     }

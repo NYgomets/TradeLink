@@ -3,7 +3,7 @@ package site.tradelink.tradelink.comment.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import site.tradelink.tradelink.comment.common.enums.CommentStatus;
-import site.tradelink.tradelink.common.entity.BaseEntity;
+import site.tradelink.tradelink.supports.entity.BaseEntity;
 import site.tradelink.tradelink.oauth2.entity.Member;
 import site.tradelink.tradelink.post.entity.Post;
 

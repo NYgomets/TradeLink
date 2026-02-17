@@ -1,4 +1,4 @@
-package site.tradelink.tradelink.common.entity;
+package site.tradelink.tradelink.supports.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

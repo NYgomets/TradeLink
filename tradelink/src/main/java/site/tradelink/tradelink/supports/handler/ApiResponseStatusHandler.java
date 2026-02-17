@@ -1,4 +1,4 @@
-package site.tradelink.tradelink.common.handler;
+package site.tradelink.tradelink.supports.handler;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -8,7 +8,7 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-import site.tradelink.tradelink.common.request.ApiResponse;
+import site.tradelink.tradelink.supports.request.ApiResponse;
 
 @RestControllerAdvice
 public class ApiResponseStatusHandler implements ResponseBodyAdvice<ApiResponse<?>> {
