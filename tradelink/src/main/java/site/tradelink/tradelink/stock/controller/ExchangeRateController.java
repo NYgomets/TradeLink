@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/exchange-rates")
+@RequestMapping("/exchange-rates")
 @RequiredArgsConstructor
 public class ExchangeRateController {
 

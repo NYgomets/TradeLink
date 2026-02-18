@@ -27,7 +27,7 @@ public class OAuth2ClientConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/v1/api/**").access(new WebExpressionAuthorizationManager("hasAnyRole('USER')"))
+                        .requestMatchers("/auth/**").access(new WebExpressionAuthorizationManager("hasAnyRole('USER')"))
                         .anyRequest().permitAll()
                 );
 
@@ -43,7 +43,7 @@ public class OAuth2ClientConfig {
         );
 
         http.logout(logout -> logout
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/exchange-rates")
         );
 
         return http.build();
