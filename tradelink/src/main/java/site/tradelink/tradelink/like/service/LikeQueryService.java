@@ -25,9 +25,13 @@ public class LikeQueryService {
      * 2. 총 좋아요 개수 (숫자 표기용)
      */
     public LikeStatusResponseDto getLikeStatus(Long memberSeq, Long postSeq) {
-        Boolean isLiked = likeStatusRepository.findByMemberSeqAndPostSeq(memberSeq, postSeq)
-                .map(LikeStatus::getIsLiked)
-                .orElse(false);
+        Boolean isLiked = false;
+
+        if (memberSeq != null) {
+            isLiked = likeStatusRepository.findByMemberSeqAndPostSeq(memberSeq, postSeq)
+                    .map(LikeStatus::getIsLiked)
+                    .orElse(false);
+        }
 
         Long likeCount = getPostLikeCount(postSeq);
         return LikeStatusResponseDto.of(postSeq, isLiked, likeCount);
