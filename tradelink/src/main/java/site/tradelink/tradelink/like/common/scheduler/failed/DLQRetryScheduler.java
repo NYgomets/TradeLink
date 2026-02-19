@@ -27,7 +27,6 @@ public class DLQRetryScheduler {
      * - 매 1분마다 실행
      * - 재시도 횟수가 MAX_RETRY_COUNT 미만인 것만
      */
-    @Scheduled(fixedDelay = 60000)
     @Transactional
     public void retryFailedEvents() {
         List<LikeEventDLQ> retryableEvents = dlqRepository.findRetryableEvents(MAX_RETRY_COUNT)
