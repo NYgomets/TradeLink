@@ -46,7 +46,7 @@ public class ExchangeRateDataService {
      * CurrentExchangeRate 업데이트
      */
     private CurrentExchangeRate updateCurrentRate(Currency currency, Double rate, LocalDateTime dateTime) {
-        Optional<CurrentExchangeRate> optional = currentRepository.findByCurrentCode(currency.getItemCode());
+        Optional<CurrentExchangeRate> optional = currentRepository.findByCurrencyCode(currency.getItemCode());
 
         CurrentExchangeRate current;
         Double previous = null;

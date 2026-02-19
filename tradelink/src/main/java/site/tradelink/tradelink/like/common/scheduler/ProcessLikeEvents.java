@@ -35,7 +35,6 @@ public class ProcessLikeEvents {
     private static final String PROCESSOR_KEY = "LIKE_POST_PROCESSOR";
     private static final int BATCH_SIZE = 100;
 
-    @Scheduled(fixedDelay = 5000)
     @Transactional
     public void processLikeEvents() {
         ProcessorOffset offset = getOrInitOffset();
