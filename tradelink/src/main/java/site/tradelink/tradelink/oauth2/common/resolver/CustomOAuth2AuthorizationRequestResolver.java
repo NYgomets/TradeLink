@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import java.util.function.Consumer;
 
@@ -15,15 +15,15 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
 
     private static final String REGISTRATION_ID_URI_VARIABLE_NAME = "registrationId";
     private final ClientRegistrationRepository clientRegistrationRepository;
-    private final AntPathRequestMatcher authorizationRequestMatcher;
+    private final PathPatternRequestMatcher authorizationRequestMatcher;
     private final DefaultOAuth2AuthorizationRequestResolver defaultResolver;
     private static final Consumer<OAuth2AuthorizationRequest.Builder> DEFAULT_PKCE_APPLIER = OAuth2AuthorizationRequestCustomizers
             .withPkce();
 
     public CustomOAuth2AuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository, String authorizationRequestBaseUri) {
         this.clientRegistrationRepository = clientRegistrationRepository;
-        this.authorizationRequestMatcher = new AntPathRequestMatcher(
-                authorizationRequestBaseUri + "/{" + REGISTRATION_ID_URI_VARIABLE_NAME + "}");
+        this.authorizationRequestMatcher = PathPatternRequestMatcher.withDefaults()
+                .matcher(authorizationRequestBaseUri + "/{" + REGISTRATION_ID_URI_VARIABLE_NAME + "}");
         this.defaultResolver = new DefaultOAuth2AuthorizationRequestResolver(clientRegistrationRepository, authorizationRequestBaseUri);
     }
 
