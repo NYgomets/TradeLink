@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.4'
+	id 'org.springframework.boot' version '4.0.3'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 
@@ -21,6 +21,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://projectlombok.org/edge-releases' }  // 추가
 }
 
 dependencies {
@@ -28,8 +29,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
 	// lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok:edge-SNAPSHOT'
+	annotationProcessor 'org.projectlombok:lombok:edge-SNAPSHOT'
+
+	testCompileOnly 'org.projectlombok:lombok:edge-SNAPSHOT'
+	testAnnotationProcessor 'org.projectlombok:lombok:edge-SNAPSHOT'
 
 	// validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -56,13 +60,12 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	//S3
-	implementation platform('software.amazon.awssdk:bom:2.27.21')
-	implementation 'software.amazon.awssdk:s3'
-	implementation 'software.amazon.awssdk:s3-presigner'
+	implementation 'software.amazon.awssdk:s3:2.27.21'
 
 	// eventListener
-	implementation 'org.springframework.retry:spring-retry'
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.retry:spring-retry:2.0.12'
+	implementation 'org.springframework:spring-aop'
+	implementation 'org.aspectj:aspectjweaver'
 }
 
 tasks.named('test') {

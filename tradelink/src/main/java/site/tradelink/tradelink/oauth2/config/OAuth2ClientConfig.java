@@ -1,16 +1,14 @@
 package site.tradelink.tradelink.oauth2.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
-import site.tradelink.tradelink.oauth2.common.mapper.CustomAuthorityMapper;
 import site.tradelink.tradelink.oauth2.service.CustomOAuth2UserService;
 import site.tradelink.tradelink.oauth2.service.CustomOidcUserService;
 
