@@ -23,7 +23,7 @@ public class NcpS3Config {
     @Value("${cloud.ncp.s3.secret-key}")
     private String secretKey;
 
-    @Value("${cloud.ncp.s3.region")
+    @Value("${cloud.ncp.s3.region}")
     private String region;
 
     @Bean
