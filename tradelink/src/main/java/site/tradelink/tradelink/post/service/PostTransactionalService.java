@@ -82,7 +82,9 @@ public class PostTransactionalService {
 
         post.update(updateDto.getTitle(), updateDto.getContent());
 
-        updatePostFiles(post, updateDto.getS3Keys());
+        if (updateDto.getS3Keys() != null) {
+            updatePostFiles(post, updateDto.getS3Keys());
+        }
     }
 
     private void updatePostFiles(Post post, List<String> newS3Keys) {
