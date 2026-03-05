@@ -8,6 +8,8 @@ import site.tradelink.tradelink.like.entity.LikePostEvent;
 import site.tradelink.tradelink.like.entity.LikeStatus;
 import site.tradelink.tradelink.like.repository.LikeStatusRepository;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class LikeEventProcessor {
@@ -16,16 +18,23 @@ public class LikeEventProcessor {
 
     @Transactional
     public boolean processSingleLikeStatus(LikePostEvent event) {
-        LikeStatus likeStatus = likeStatusRepository.findByMemberSeqAndPostSeq(event.getMemberSeq(), event.getPostSeq())
-                .orElseGet(() -> likeStatusRepository.save(LikeStatus.builder()
-                        .memberSeq(event.getMemberSeq())
-                        .postSeq(event.getPostSeq())
-                        .isLiked(false)
-                        .build()));
-
         boolean isLikedAction = event.getActionType() == ActionType.LIKE;
 
-        if (likeStatus.getIsLiked().equals(isLikedAction)) {
+        Optional<LikeStatus> optional = likeStatusRepository.findByMemberSeqAndPostSeq(event.getMemberSeq(), event.getPostSeq());
+
+        if (optional.isEmpty()) {
+            likeStatusRepository.save(LikeStatus.builder()
+                    .memberSeq(event.getMemberSeq())
+                    .postSeq(event.getPostSeq())
+                    .isLiked(isLikedAction)
+                    .build());
+
+            return isLikedAction;
+        }
+
+        LikeStatus likeStatus = optional.get();
+
+        if (likeStatus.getIsLiked() == isLikedAction) {
             return false;
         }
 
