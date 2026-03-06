@@ -9,6 +9,11 @@ import site.tradelink.tradelink.supports.entity.BaseEntity;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(
+        indexes = {
+                @Index(name = "idx_processor_offset_name", columnList = "processor_name")
+        }
+)
 public class ProcessorOffset extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

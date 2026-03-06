@@ -1,7 +1,6 @@
 package site.tradelink.tradelink.like.common.scheduler.failed;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.like.entity.LikePostEvent;

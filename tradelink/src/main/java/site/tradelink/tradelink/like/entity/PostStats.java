@@ -9,6 +9,11 @@ import site.tradelink.tradelink.supports.entity.BaseEntity;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(
+        indexes = {
+                @Index(name = "idx_post_stats_post_seq", columnList = "post_seq")
+        }
+)
 public class PostStats extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
