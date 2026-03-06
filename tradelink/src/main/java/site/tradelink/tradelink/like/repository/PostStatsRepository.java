@@ -14,8 +14,5 @@ import java.util.Optional;
 public interface PostStatsRepository extends JpaRepository<PostStats, Long> {
     Optional<PostStats> findByPostSeq(Long postSeq);
 
-    @Query("SELECT ps FROM PostStats ps WHERE ps.postSeq IN :postSeqs")
-    List<PostStats> findAllByPostSeqs(@Param("postSeqs") List<Long> postSeqs);
-
     List<PostStats> findAllByPostSeqIn(Collection<Long> postSeqs);
 }

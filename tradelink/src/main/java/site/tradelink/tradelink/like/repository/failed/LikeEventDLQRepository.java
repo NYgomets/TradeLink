@@ -17,5 +17,4 @@ public interface LikeEventDLQRepository extends JpaRepository<LikeEventDLQ, Long
     @Query("SELECT d FROM LikeEventDLQ d WHERE d.retryCount < :maxRetry ORDER BY d.seq ASC")
     List<LikeEventDLQ> findRetryableEvents(@Param("maxRetry") int maxRetry);
 
-    long countByRetryCountGreaterThanEqual(int retryCount);
 }

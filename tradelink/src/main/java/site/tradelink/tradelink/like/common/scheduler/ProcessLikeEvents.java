@@ -3,7 +3,6 @@ package site.tradelink.tradelink.like.common.scheduler;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.like.common.enums.ActionType;

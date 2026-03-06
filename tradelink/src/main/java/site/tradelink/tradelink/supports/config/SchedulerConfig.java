@@ -55,7 +55,7 @@ public class SchedulerConfig implements SchedulingConfigurer {
         return args -> {
             likeScheduler.scheduleWithFixedDelay(
                     processLikeEvents::processLikeEvents,
-                    Duration.ofMillis(5000)
+                    Duration.ofMillis(1000)
             );
             dlqScheduler.scheduleWithFixedDelay(
                     dlqRetryScheduler::retryFailedEvents,
