@@ -14,6 +14,11 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(
+        indexes = {
+                @Index(name = "idx_daily_currency_date", columnList = "currency_code, base_date")
+        }
+)
 public class DailyExchangeRate extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
