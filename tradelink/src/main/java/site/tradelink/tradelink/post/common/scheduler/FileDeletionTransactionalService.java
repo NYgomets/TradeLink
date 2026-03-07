@@ -33,11 +33,20 @@ public class FileDeletionTransactionalService {
             return Collections.emptyList();
         }
 
+        List<Long> postSeqs = postsToPurge.stream()
+                .map(Post::getSeq)
+                .toList();
+
+        // batch_fetch_size 설정으로 자동으로 IN 쿼리 실행
         List<String> s3KeysToPurge = postsToPurge.stream()
                 .flatMap(post -> post.getUploadFiles().stream())
                 .map(UploadFile::getS3Key)
                 .toList();
 
+        // UploadFile 먼저 IN 쿼리로 삭제 → orphanRemoval 동작 안 하도록 선제 처리
+        uploadFileRepository.deleteByPostSeqIn(postSeqs);
+
+        // Post 배치 삭제
         postRepository.deleteAllInBatch(postsToPurge);
 
         return s3KeysToPurge;

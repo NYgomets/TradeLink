@@ -17,32 +17,21 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 게시글 상세 조회
     @Query("""
-            SELECT DISTINCT p FROM Post p
+            SELECT p FROM Post p
             JOIN FETCH p.member
-            LEFT JOIN FETCH p.uploadFiles
             WHERE p.seq = :postSeq
             AND p.status = 'ACTIVE'
             """)
     Optional<Post> findActivePostWithDetailsBySeq(@Param("postSeq") Long postSeq);
 
-    // 수정용 조회
-    @Query("""
-            SELECT DISTINCT p FROM Post p
-            LEFT JOIN FETCH p.uploadFiles
-            WHERE p.seq = :postSeq
-            AND p.member.seq = :memberSeq
-            AND p.status = 'ACTIVE'
-            """)
-    Optional<Post> findActivePostWithFilesBySeqAndMemberSeq(@Param("postSeq") Long poseSeq, @Param("memberSeq") Long memberSeq);
-
-    // 삭제용 조회
+    // 수정용 or post softDelete 전환
     @Query("""
             SELECT p FROM Post p
             WHERE p.seq = :postSeq
             AND p.member.seq = :memberSeq
             AND p.status = 'ACTIVE'
             """)
-    Optional<Post> findActivePostBySeqAndMemberSeq(@Param("postSeq") Long postSeq, @Param("memberSeq")  Long memberSeq);
+    Optional<Post> findActivePostBySeqAndMemberSeq(@Param("postSeq") Long poseSeq, @Param("memberSeq") Long memberSeq);
 
     /**
      * soft-delete된 게시글들 중 특정 시간 이전에 삭제된 것들을 조회
@@ -51,8 +40,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @return List<Post>
      */
     @Query("""
-            SELECT DISTINCT p FROM Post p
-            LEFT JOIN FETCH p.uploadFiles
+            SELECT p FROM Post p
             WHERE p.status = :status
             AND p.deletedTime < :cutoffDate
             """)

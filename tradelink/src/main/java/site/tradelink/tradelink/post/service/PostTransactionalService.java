@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.oauth2.entity.Member;
 import site.tradelink.tradelink.oauth2.repository.MemberRepository;
-import site.tradelink.tradelink.post.common.enums.PostStatus;
 import site.tradelink.tradelink.post.entity.Post;
 import site.tradelink.tradelink.post.entity.UploadFile;
 import site.tradelink.tradelink.post.repository.PostRepository;
+import site.tradelink.tradelink.post.repository.file.UploadFileRepository;
 import site.tradelink.tradelink.post.request.PostCreateDto;
 import site.tradelink.tradelink.post.request.PostUpdateDto;
 import site.tradelink.tradelink.post.response.PostResponseDto;
@@ -24,9 +24,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostTransactionalService {
 
+    private final FileUrlService fileUrlService;
+
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
-    private final FileUrlService fileUrlService;
+    private final UploadFileRepository uploadFileRepository;
 
     @Transactional
     public Long createPostAndMetadata(PostCreateDto request, Long memberSeq) {
@@ -59,7 +61,7 @@ public class PostTransactionalService {
         Post post = postRepository.findActivePostWithDetailsBySeq(postSeq)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-        List<String> imageUrls = post.getUploadFiles().stream()
+        List<String> imageUrls = uploadFileRepository.findByPostSeq(postSeq).stream()
                 .map(file -> fileUrlService.issueDownloadUrl(file.getS3Key()))
                 .toList();
 
@@ -77,18 +79,19 @@ public class PostTransactionalService {
     @Transactional
     public void updatePost(Long postSeq, Long memberSeq, PostUpdateDto updateDto) {
         // 추후 Error 작업 추가
-        Post post = postRepository.findActivePostWithFilesBySeqAndMemberSeq(postSeq, memberSeq)
+        Post post = postRepository.findActivePostBySeqAndMemberSeq(postSeq, memberSeq)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 없거나 수정 권한이 없습니다."));
 
         post.update(updateDto.getTitle(), updateDto.getContent());
 
         if (updateDto.getS3Keys() != null) {
-            updatePostFiles(post, updateDto.getS3Keys());
+            List<UploadFile> currentFiles = uploadFileRepository.findByPostSeq(postSeq);
+            updatePostFiles(post, currentFiles, updateDto.getS3Keys());
         }
     }
 
-    private void updatePostFiles(Post post, List<String> newS3Keys) {
-        Map<String, UploadFile> existingFilesMap = post.getUploadFiles().stream()
+    private void updatePostFiles(Post post, List<UploadFile> currentFiles, List<String> newS3Keys) {
+        Map<String, UploadFile> existingFilesMap = currentFiles.stream()
                 .collect(Collectors.toMap(UploadFile::getS3Key, file -> file));
 
         Set<String> newKeysSet = new HashSet<>(newS3Keys);
