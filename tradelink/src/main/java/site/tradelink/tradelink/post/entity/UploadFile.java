@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(indexes = {
+        @Index(name = "idx_upload_file_post_seq", columnList = "post_seq"),
+        @Index(name = "idx_upload_file_status_deleted_time", columnList = "status, deleted_time"),
+        @Index(name = "idx_upload_file_s3_key", columnList = "s3Key")
+})
 public class UploadFile extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
