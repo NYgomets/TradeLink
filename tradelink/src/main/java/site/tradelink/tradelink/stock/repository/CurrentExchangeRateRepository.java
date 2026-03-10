@@ -7,7 +7,7 @@ import site.tradelink.tradelink.stock.entity.CurrentExchangeRate;
 import java.util.Optional;
 
 @Repository
-public interface CurrentExchangeRateRepository extends JpaRepository<CurrentExchangeRate, Long> {
+public interface CurrentExchangeRateRepository extends JpaRepository<CurrentExchangeRate, Long>, CurrentExchangeRateCustomRepository {
 
     Optional<CurrentExchangeRate> findByCurrencyCode(String currencyCode);
 }
