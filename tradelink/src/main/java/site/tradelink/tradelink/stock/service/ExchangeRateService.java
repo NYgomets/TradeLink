@@ -2,6 +2,7 @@ package site.tradelink.tradelink.stock.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.stock.entity.ExchangeRate;
 import site.tradelink.tradelink.stock.repository.CurrentExchangeRateRepository;
@@ -25,7 +26,7 @@ public class ExchangeRateService {
     /**
      * 최신 환율 조회
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<ExchangeRateSummaryDto> getLatestExchangeRates() {
         return currentRepository.findAll().stream()
                 .map(ExchangeRateSummaryDto::fromCurrent)
@@ -36,7 +37,7 @@ public class ExchangeRateService {
      * 테이블용
      * 클라이언트가 보낸 일 수(period)를 기반으로 조회
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<ExchangeRateSummaryDto> getTableExchangeRates(String currencyCode, String period) {
 
         int days = parsePeriod(period);
@@ -55,7 +56,7 @@ public class ExchangeRateService {
      * 클라이언트가 보낸 일 수(period)를 기반으로 조회
      * 임계값 1일: 1일은 당일 00시 부터 상세 로그, 그 외는 일별 종가 테이블 조회
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<ExchangeRateChartPointDto> getChartExchangeRates(String currencyCode, String period) {
 
         int days = parsePeriod(period);
