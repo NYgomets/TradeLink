@@ -11,6 +11,8 @@ import site.tradelink.tradelink.stock.service.ExchangeRateDataService;
 import site.tradelink.tradelink.stock.service.ExchangeRateUpdateService;
 import site.tradelink.tradelink.stock.sse.SseEmitterManager;
 
+import java.util.concurrent.Executors;
+
 /**
  * 환율 스케줄러
  */
@@ -28,15 +30,19 @@ public class ExchangeRateScheduler {
      */
     @Scheduled(cron = "${scheduler.exchange-rate.update-cron:0 */10 * * * MON-FRI}")
     public void updateExchangeRate() {
-        for (Currency currency : Currency.values()) {
-            try {
-                // 1. API 호출 + DB 저장
-                CurrentExchangeRate updated = updateService.updateCurrency(currency);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (Currency currency : Currency.values()) {
+                executor.submit(() -> {
+                    try {
+                        // 1. API 호출 + DB 저장
+                        CurrentExchangeRate updated = updateService.updateCurrency(currency);
 
-                // 2. SSE 브로드캐스트
-                broadcastExchangeRate(updated);
-            } catch (Exception e) {
-                log.error("Failed to update {}: {}", currency.name(), e.getMessage());
+                        // 2. SSE 브로드캐스트
+                        broadcastExchangeRate(updated);
+                    } catch (Exception e) {
+                        log.error("Failed to update {}: {}", currency.name(), e.getMessage());
+                    }
+                });
             }
         }
     }
