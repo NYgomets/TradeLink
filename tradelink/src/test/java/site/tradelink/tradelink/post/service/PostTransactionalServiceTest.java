@@ -192,7 +192,7 @@ class PostTransactionalServiceTest {
                     .s3Keys(List.of())
                     .build();
 
-            given(postRepository.findActivePostWithFilesBySeqAndMemberSeq(postSeq, memberSeq))
+            given(postRepository.findActivePostBySeqAndMemberSeq(postSeq, memberSeq))
                     .willReturn(Optional.of(post));
 
             // when
@@ -216,7 +216,7 @@ class PostTransactionalServiceTest {
                     .s3Keys(List.of())
                     .build();
 
-            given(postRepository.findActivePostWithFilesBySeqAndMemberSeq(postSeq, memberSeq))
+            given(postRepository.findActivePostBySeqAndMemberSeq(postSeq, memberSeq))
                     .willReturn(Optional.empty());
 
             // when & then
