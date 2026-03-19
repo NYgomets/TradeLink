@@ -6,9 +6,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class LikePostResponseDto {
-    private int acceptedCount;
 
-    public static LikePostResponseDto accepted(int count) {
-        return new LikePostResponseDto(count);
+    private Boolean isLiked;
+    private Long likeCount;
+
+    public static LikePostResponseDto of(Boolean isLiked, Long likeCount) {
+        return new LikePostResponseDto(isLiked, likeCount);
     }
 }

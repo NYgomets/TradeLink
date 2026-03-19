@@ -12,9 +12,6 @@ import site.tradelink.tradelink.supports.entity.BaseEntity;
 @Table(
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_member_post", columnNames = {"member_seq", "post_seq"})
-        },
-        indexes = {
-                @Index(name = "idx_like_status_member_time", columnList = "member_seq, modified_time DESC")
         }
 )
 public class LikeStatus extends BaseEntity {
@@ -28,11 +25,4 @@ public class LikeStatus extends BaseEntity {
 
     @Column(nullable = false)
     private Long postSeq;
-
-    @Column(nullable = false)
-    private Boolean isLiked;
-
-    public void updateLikeStatus(Boolean isLiked) {
-        this.isLiked = isLiked;
-    }
 }
