@@ -1,8 +1,9 @@
 package site.tradelink.tradelink.cryptocurrency.clients;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -17,6 +18,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -57,20 +59,26 @@ public class BithumbWebsocketClient implements WebSocketHandler {
     private final BithumbOrderBookHandler orderBookHandler;
     private final ObjectMapper objectMapper;
 
-    private WebSocketSession session;
     private final AtomicInteger reconnectAttempts = new AtomicInteger(0);
+    // 중복 재연결 방지용 플래그
+    private final AtomicBoolean isConnecting =  new AtomicBoolean(false);
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void connect() {
         connectInternal();
     }
 
     // 연결
     private void connectInternal() {
-        StandardWebSocketClient client = new StandardWebSocketClient();
+        if (!isConnecting.compareAndSet(false, true)) {
+            return;
+        }
 
+        StandardWebSocketClient client = new StandardWebSocketClient();
         client.execute(this, WS_URL) // CompletableFuture<WebSocketSession>
                 .whenComplete((session, ex) -> {
+                    isConnecting.set(false);
+
                     if (ex != null) {
                         log.error("[Bithumb WS] 연결 실패: {}", ex.getMessage());
                         scheduleReconnect();
@@ -104,10 +112,10 @@ public class BithumbWebsocketClient implements WebSocketHandler {
             String type = root.path("type").asText();
 
             switch (type) {
-                case "ticker": tickerHandler.handle(root);
-                case "orderbooksnapshot": snapshotHandler.handle(root);
-                case  "orderbookdepth": orderBookHandler.handle(root);
-                default: log.trace("[Bithumb WS] 미처리 타입: {}", type);
+                case "ticker" -> tickerHandler.handle(root);
+                case "orderbooksnapshot" -> snapshotHandler.handle(root);
+                case  "orderbookdepth" -> orderBookHandler.handle(root);
+                default -> log.trace("[Bithumb WS] 미처리 타입: {}", type);
             }
         } catch (Exception e) {
             log.error("[Bithumb WS] 메시지 처리 오류: {}", e.getMessage());
