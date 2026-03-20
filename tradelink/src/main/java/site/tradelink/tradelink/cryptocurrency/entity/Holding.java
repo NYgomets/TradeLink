@@ -34,18 +34,28 @@ public class Holding extends BaseEntity {
     // 평균 매수가
     private Double avgPrice;
 
-    public void buy(long price, long qty) {
+    public void buy(long price, double qty) {
         double totalCost = this.avgPrice * this.quantity + price * qty;
         this.quantity += qty;
         this.avgPrice  = totalCost / this.quantity;
     }
 
-    public void sell(long qty) {
+    public void sell(double qty) {
         if (qty > this.quantity) {
             throw new IllegalStateException(
                     "보유 수량 부족: " + this.ticker
                             + " (보유=" + this.quantity + ", 요청=" + qty + ")");
         }
         this.quantity -= qty;
+    }
+
+    public static Holding create(Long memberSeq, String ticker, String name) {
+        return Holding.builder()
+                .memberSeq(memberSeq)
+                .ticker(ticker)
+                .name(name)
+                .quantity(0.0)
+                .avgPrice(0.0)
+                .build();
     }
 }

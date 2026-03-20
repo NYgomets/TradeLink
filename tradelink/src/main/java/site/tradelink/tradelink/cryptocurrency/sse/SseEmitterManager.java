@@ -8,14 +8,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import site.tradelink.tradelink.cryptocurrency.dto.OrderBookDto;
 import site.tradelink.tradelink.cryptocurrency.dto.StockPriceSummaryDto;
-import site.tradelink.tradelink.cryptocurrency.dto.TradeLogDto;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 import site.tradelink.tradelink.cryptocurrency.inMemory.StockPriceCache;
 import site.tradelink.tradelink.cryptocurrency.sse.dto.MyOrderDto;
 import site.tradelink.tradelink.cryptocurrency.sse.dto.SseEvent;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -77,12 +75,6 @@ public class SseEmitterManager {
         // 초기 데이터: 호가창
         orderBookCache.findTop5(ticker)
                 .ifPresent(dto -> enqueue(client, "order-book", dto));
-
-        // 초기 데이터: 최근 체결 내역
-        List<TradeLogDto> logs = priceCache.findTradeLogs(ticker);
-        if (!logs.isEmpty()) {
-            enqueue(client, "trade-log-init", logs);
-        }
 
         return emitter;
     }
