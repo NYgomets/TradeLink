@@ -1,0 +1,35 @@
+package site.tradelink.tradelink.cryptocurrency.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import site.tradelink.tradelink.supports.entity.BaseEntity;
+
+// 체결 내역
+@Entity
+@Getter
+@Builder(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Table(
+        indexes = @Index(name = "idx_trade_member", columnList = "memberSeq, createTime")
+)
+public class TradeHistory extends BaseEntity {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long seq;
+
+    private Long memberSeq;
+
+    private String ticker;
+
+    private String name;
+
+    // BUT | SELL
+    private String side;
+
+    private Double quantity;
+
+    private Long execPrice;
+
+    private Double totalAmount;
+}

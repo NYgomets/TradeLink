@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public record TradeLogDto (
         String        ticker,
         long          price,        // 체결가
-        long          quantity,     // 체결량
+        double          quantity,     // 체결량
         String        side,         // "BUY" | "SELL"
         LocalDateTime tradedAt
 ) {}
