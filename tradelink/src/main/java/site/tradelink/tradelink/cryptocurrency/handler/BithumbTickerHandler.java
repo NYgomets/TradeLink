@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import site.tradelink.tradelink.cryptocurrency.dto.StockPriceSummaryDto;
+import site.tradelink.tradelink.cryptocurrency.inMemory.DirtyTracker;
+import site.tradelink.tradelink.cryptocurrency.inMemory.StockPriceCache;
 
 import java.time.LocalDateTime;
 

@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import site.tradelink.tradelink.cryptocurrency.dto.OrderBookDto;
+import site.tradelink.tradelink.cryptocurrency.inMemory.DirtyTracker;
+import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +32,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class BithumbOrderBookSnapshotHandler {
-
-    private static final int DEPTH = 5;
 
     private final OrderBookCache orderBookCache;
     private final DirtyTracker dirtyTracker;
@@ -62,14 +62,18 @@ public class BithumbOrderBookSnapshotHandler {
         if (!node.isArray()) return entries;
 
         for (JsonNode item : node) {
-            if (!item.isArray() || item.size() < 2) continue;
-            long   price = (long) Double.parseDouble(item.get(0).asText());
-            double qty   = Double.parseDouble(item.get(1).asText());
+            if (!item.isArray() || item.size() < 2) {
+                continue;
+            }
+
+            long price = (long) Double.parseDouble(item.get(0).asText());
+            double qty = Double.parseDouble(item.get(1).asText());
+
             if (price > 0 && qty > 0) {
                 entries.add(new OrderBookDto.OrderBookEntry(price, qty));
             }
         }
 
-        return entries.size() > DEPTH ? entries.subList(0, DEPTH) : entries;
+        return entries;
     }
 }
