@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import site.tradelink.tradelink.supports.entity.BaseEntity;
 
+import java.time.LocalDateTime;
+
 // 체결 내역
 @Entity
 @Getter
@@ -32,4 +34,16 @@ public class TradeHistory extends BaseEntity {
     private Long execPrice;
 
     private Double totalAmount;
+
+    public static TradeHistory of(Long memberSeq, OrderEvent event, long execPrice, String name) {
+        return TradeHistory.builder()
+                .memberSeq   (memberSeq)
+                .ticker     (event.getTicker())
+                .name       (name)
+                .side       (event.getSide())
+                .quantity   (event.getQuantity())
+                .execPrice  (execPrice)
+                .totalAmount(execPrice * event.getQuantity())
+                .build();
+    }
 }
