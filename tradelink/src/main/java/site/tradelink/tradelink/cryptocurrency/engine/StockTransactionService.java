@@ -2,6 +2,7 @@ package site.tradelink.tradelink.cryptocurrency.engine;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.cryptocurrency.entity.Holding;
@@ -11,6 +12,7 @@ import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.handler.CryptoName;
 import site.tradelink.tradelink.cryptocurrency.repository.HoldingRepository;
 import site.tradelink.tradelink.cryptocurrency.repository.TradeHistoryRepository;
+import site.tradelink.tradelink.cryptocurrency.service.WalletService;
 
 /**
  * 주식 체결 DB 트랜잭션 서비스
@@ -20,6 +22,8 @@ import site.tradelink.tradelink.cryptocurrency.repository.TradeHistoryRepository
 @Service
 @RequiredArgsConstructor
 public class StockTransactionService {
+
+    private final WalletService walletService;
 
     private final HoldingRepository holdingRepository;
     private final TradeHistoryRepository tradeHistoryRepository;
@@ -31,6 +35,7 @@ public class StockTransactionService {
         OrderSide side = event.getSide();
         Double quantity = event.getQuantity();
         Long memberSeq = event.getMemberSeq();
+        long execAmount = (long) (execPrice * quantity);
 
         // 매도: 보유 수량 검증 + 차감
         if (OrderSide.SELL == side) {
@@ -42,10 +47,13 @@ public class StockTransactionService {
             if (holding.getQuantity() == 0) {
                 holdingRepository.delete(holding);
             }
+            walletService.confirmSell(memberSeq, execAmount);
         }
 
         // 매수: Holding 평균가 갱신
         if (OrderSide.BUY == side) {
+            walletService.confirmBuy(memberSeq, event.getReservedPrice(), execAmount);
+
             Holding holding = holdingRepository.findByMemberSeqAndTicker(memberSeq, ticker)
                     .orElseGet(() -> Holding.create(memberSeq, ticker, CryptoName.of(ticker)));
 
