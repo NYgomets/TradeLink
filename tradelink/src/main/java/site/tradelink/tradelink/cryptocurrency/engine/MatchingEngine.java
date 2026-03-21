@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import site.tradelink.tradelink.cryptocurrency.entity.OrderEvent;
 import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
+import site.tradelink.tradelink.cryptocurrency.service.WalletService;
 import site.tradelink.tradelink.cryptocurrency.sse.SseEmitterManager;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class MatchingEngine {
 
     private final OrderBookCache orderBookCache;
     private final StockTransactionService transactionService;
+    private final WalletService walletService;
     private final SseEmitterManager sseManger;
 
     public void execute(OrderEvent event) {
@@ -38,7 +40,29 @@ public class MatchingEngine {
         LocalDateTime now = LocalDateTime.now();
 
         // 2. DB 작업 (트랜잭션 범위 최소화)
-        transactionService.process(event, execPrice);
+        try {
+            transactionService.process(event, execPrice);
+        } catch (IllegalStateException e) {
+            log.warn("[Matching] 체결 실패 memberSeq={} ticker={}: {}",
+                    memberSeq, ticker, e.getMessage());
+
+            // 슬리피지 실패: 트랜잭션 밖에서 예약금 환불
+            // (트랜잭션 안에서 환불 시 예외로 인해 환불도 롤백되는 문제 방지)
+            if (OrderSide.BUY.equals(event.getSide()) && event.getReservedPrice() > 0) {
+                try {
+                    walletService.cancelReservation(memberSeq, event.getReservedPrice());
+                } catch (Exception ex) {
+                    log.error("[Matching] 예약금 환불 실패 memberSeq={}: {}", memberSeq, ex.getMessage());
+                }
+            }
+
+            try {
+                sseManger.pushMyOrder(memberSeq, ticker, execPrice, quantity, side, "FAILED", now);
+            } catch (Exception ex) {
+                log.warn("[Matching] SSE 실패 알림 전송 실패: {}", ex.getMessage());
+            }
+            throw e;
+        }
 
         // 3. SSE push (실패해도 클라이언트가 GET /orders로 폴백 가능)
         try {

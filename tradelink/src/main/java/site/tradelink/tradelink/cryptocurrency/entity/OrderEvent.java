@@ -33,12 +33,15 @@ public class OrderEvent extends BaseEntity {
 
     private Double quantity;
 
-    public static OrderEvent create(Long memberSeq, String ticker, OrderSide side, Double quantity) {
+    private Long reservedPrice;
+
+    public static OrderEvent create(Long memberSeq, String ticker, OrderSide side, Double quantity, Long reservedPrice) {
         return OrderEvent.builder()
                 .memberSeq(memberSeq)
                 .ticker(ticker)
-                .side(side) // 필요하면 검증 추가
+                .side(side)
                 .quantity(quantity)
+                .reservedPrice(reservedPrice)
                 .build();
     }
 }
