@@ -26,4 +26,11 @@ public class ProcessorOffset extends BaseEntity {
     public void advance (Long lastSeq) {
         this.lastSeq = lastSeq;
     }
+
+    public static ProcessorOffset create(String ticker) {
+        return ProcessorOffset.builder()
+                .ticker(ticker)
+                .lastSeq(0L)
+                .build();
+    }
 }

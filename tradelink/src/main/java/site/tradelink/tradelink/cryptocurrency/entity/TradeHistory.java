@@ -2,6 +2,7 @@ package site.tradelink.tradelink.cryptocurrency.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.supports.entity.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class TradeHistory extends BaseEntity {
     private String name;
 
     // BUT | SELL
-    private String side;
+    private OrderSide side;
 
     private Double quantity;
 

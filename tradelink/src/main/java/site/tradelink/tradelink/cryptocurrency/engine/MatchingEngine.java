@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import site.tradelink.tradelink.cryptocurrency.entity.OrderEvent;
-import site.tradelink.tradelink.cryptocurrency.inMemory.DirtyTracker;
+import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 import site.tradelink.tradelink.cryptocurrency.sse.SseEmitterManager;
 
@@ -23,11 +23,10 @@ public class MatchingEngine {
     private final OrderBookCache orderBookCache;
     private final StockTransactionService transactionService;
     private final SseEmitterManager sseManger;
-    private final DirtyTracker dirtyTracker;
 
     public void execute(OrderEvent event) {
         String ticker = event.getTicker();
-        String side = event.getSide();
+        OrderSide side = event.getSide();
         Double quantity = event.getQuantity();
         Long memberSeq = event.getMemberSeq();
 
@@ -41,15 +40,7 @@ public class MatchingEngine {
         // 2. DB 작업 (트랜잭션 범위 최소화)
         transactionService.process(event, execPrice);
 
-        // 3. 캐시 차감 + dirty 표시  (실패해도 빗썸 다음 수신 시 자연 복구)
-        try {
-            orderBookCache.consume(ticker, side, execPrice, quantity);
-            dirtyTracker.markDirty(ticker);
-        } catch (Exception e) {
-            log.warn("[Matching] 캐시 차감 실패 (자연 복구됨) ticker={}: {}", ticker, e.getMessage());
-        }
-
-        // 4. SSE push (실패해도 클라이언트가 GET /orders로 폴백 가능)
+        // 3. SSE push (실패해도 클라이언트가 GET /orders로 폴백 가능)
         try {
             sseManger.pushMyOrder(memberSeq, ticker, execPrice, quantity, side, "FILLED", now);
         } catch (Exception e) {

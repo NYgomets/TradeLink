@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import site.tradelink.tradelink.cryptocurrency.dto.OrderBookDto;
+import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 
 import java.time.Instant;
 import java.util.*;
@@ -87,7 +88,7 @@ public class OrderBookCache {
     }
 
     // 체결가 조회 (stale 체크 포함 / stale 상태면 empty 반환 -> 주문 거부
-    public OptionalLong getBestPrice(String ticker, String side) {
+    public OptionalLong getBestPrice(String ticker, OrderSide side) {
         if (isStale(ticker)) {
             log.warn("[OrderBookCache] {} 호가 stale ({}ms 초과)", ticker, staleTtlMs);
             return OptionalLong.empty();
@@ -98,7 +99,7 @@ public class OrderBookCache {
             return OptionalLong.empty();
         }
 
-        List<OrderBookDto.OrderBookEntry> levels = "BUY".equals(side) ? cached.bookDto.asks() : cached.bookDto.bids();
+        List<OrderBookDto.OrderBookEntry> levels = OrderSide.BUY == side ? cached.bookDto.asks() : cached.bookDto.bids();
 
         if (levels == null || levels.isEmpty()) {
             return OptionalLong.empty();
@@ -118,34 +119,6 @@ public class OrderBookCache {
         return Optional.ofNullable(cache.get(ticker))
                 .map(CachedOrderBook::receivedAt);
     }
-
-    // 체결 후 잔량 차감
-    public void consume(String ticker, String side, long price, double quantity) {
-        cache.computeIfPresent(ticker, (k, cached) -> {
-            List<OrderBookDto.OrderBookEntry> original = "BUY".equals(side)
-                    ? cached.bookDto().asks()
-                    : cached.bookDto().bids();
-
-            if (original == null || original.isEmpty()) return cached;
-
-            List<OrderBookDto.OrderBookEntry> updated = new ArrayList<>();
-            for (OrderBookDto.OrderBookEntry entry : original) {
-                if (entry.price() == price) {
-                    double remaining = entry.quantity() - quantity;
-                    if (remaining > 0) updated.add(new OrderBookDto.OrderBookEntry(entry.price(), remaining));
-                } else {
-                    updated.add(entry);
-                }
-            }
-
-            OrderBookDto updatedBook = "BUY".equals(side)
-                    ? new OrderBookDto(ticker, updated, cached.bookDto().bids())
-                    : new OrderBookDto(ticker, cached.bookDto().asks(), updated);
-
-            return new CachedOrderBook(updatedBook, cached.receivedAt());
-        });
-    }
-
 
     /**
      * 내부 유틸

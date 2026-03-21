@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import site.tradelink.tradelink.cryptocurrency.dto.OrderBookDto;
 import site.tradelink.tradelink.cryptocurrency.dto.StockPriceSummaryDto;
+import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 import site.tradelink.tradelink.cryptocurrency.inMemory.StockPriceCache;
 import site.tradelink.tradelink.cryptocurrency.sse.dto.MyOrderDto;
@@ -119,7 +120,7 @@ public class SseEmitterManager {
 
     // MatchingEngine이 직접 호출, 해당 멤버만
     public void pushMyOrder(Long memberSeq, String ticker, long price,
-                            double quantity, String side, String status,
+                            double quantity, OrderSide side, String status,
                             LocalDateTime at) {
 
         MyOrderDto dto = new MyOrderDto(ticker, price, quantity, side, status, at);

@@ -2,6 +2,7 @@ package site.tradelink.tradelink.cryptocurrency.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.supports.entity.BaseEntity;
 
 /**
@@ -27,7 +28,17 @@ public class OrderEvent extends BaseEntity {
     private Long memberSeq;
 
     // BUY | SELL
-    private String side;
+    @Enumerated(EnumType.STRING)
+    private OrderSide side;
 
     private Double quantity;
+
+    public static OrderEvent create(Long memberSeq, String ticker, OrderSide side, Double quantity) {
+        return OrderEvent.builder()
+                .memberSeq(memberSeq)
+                .ticker(ticker)
+                .side(side) // 필요하면 검증 추가
+                .quantity(quantity)
+                .build();
+    }
 }
