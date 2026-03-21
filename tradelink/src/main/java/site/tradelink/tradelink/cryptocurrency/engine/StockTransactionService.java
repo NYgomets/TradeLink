@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.cryptocurrency.entity.Holding;
 import site.tradelink.tradelink.cryptocurrency.entity.OrderEvent;
 import site.tradelink.tradelink.cryptocurrency.entity.TradeHistory;
+import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.handler.CryptoName;
 import site.tradelink.tradelink.cryptocurrency.repository.HoldingRepository;
 import site.tradelink.tradelink.cryptocurrency.repository.TradeHistoryRepository;
@@ -27,12 +28,12 @@ public class StockTransactionService {
     @Transactional
     public void process(OrderEvent event, long execPrice) {
         String ticker = event.getTicker();
-        String side = event.getSide();
+        OrderSide side = event.getSide();
         Double quantity = event.getQuantity();
         Long memberSeq = event.getMemberSeq();
 
         // 매도: 보유 수량 검증 + 차감
-        if ("SELL".equals(side)) {
+        if (OrderSide.SELL == side) {
             Holding holding = holdingRepository.findByMemberSeqAndTicker(memberSeq, ticker)
                     .orElseThrow(() -> new IllegalStateException(
                             "보유 수량 없음: " + ticker));
@@ -44,7 +45,7 @@ public class StockTransactionService {
         }
 
         // 매수: Holding 평균가 갱신
-        if ("BUY".equals(side)) {
+        if (OrderSide.BUY == side) {
             Holding holding = holdingRepository.findByMemberSeqAndTicker(memberSeq, ticker)
                     .orElseGet(() -> Holding.create(memberSeq, ticker, CryptoName.of(ticker)));
 
