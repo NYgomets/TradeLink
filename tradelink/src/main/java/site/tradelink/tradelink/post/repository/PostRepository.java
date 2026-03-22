@@ -1,5 +1,7 @@
 package site.tradelink.tradelink.post.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -45,4 +47,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             AND p.deletedTime < :cutoffDate
             """)
     List<Post> findByStatusAndDeletedTimeBefore(@Param("status") PostStatus status, @Param("cutoffDate") LocalDateTime cutoffDate);
+
+    @Query("""
+    SELECT p FROM Post p
+    JOIN FETCH p.member
+    WHERE p.status = 'ACTIVE'
+    ORDER BY p.createTime DESC
+    """)
+    Page<Post> findActivePostsWithMember(Pageable pageable);
 }

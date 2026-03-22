@@ -1,11 +1,13 @@
 package site.tradelink.tradelink.post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import site.tradelink.tradelink.post.common.enums.AllowedImageContentType;
 import site.tradelink.tradelink.post.request.PostCreateDto;
 import site.tradelink.tradelink.post.request.PostUpdateDto;
 import site.tradelink.tradelink.post.response.PostResponseDto;
+import site.tradelink.tradelink.post.response.PostSummaryDto;
 import site.tradelink.tradelink.post.response.PreSignedUrlDto;
 import site.tradelink.tradelink.post.service.file.FileUrlService;
 
@@ -48,5 +50,9 @@ public class PostService {
 
     public void deletePost(Long postSeq, Long memberSeq) {
         transactionalService.softDeletePost(postSeq, memberSeq);
+    }
+
+    public Page<PostSummaryDto> getPosts(int page, int size) {
+        return transactionalService.getPosts(page, size);
     }
 }
