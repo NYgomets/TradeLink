@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import site.tradelink.tradelink.oauth2.service.CustomOAuth2UserService;
 import site.tradelink.tradelink.oauth2.service.CustomOidcUserService;
 
@@ -23,6 +25,12 @@ public class OAuth2ClientConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        http.csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+        );
+
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/auth/**").access(new WebExpressionAuthorizationManager("hasAnyRole('USER')"))
@@ -38,10 +46,11 @@ public class OAuth2ClientConfig {
                         authorizationEndpointConfig -> authorizationEndpointConfig
                                 .authorizationRequestResolver(customAuthorizationRequestResolver)
                 )
+                .defaultSuccessUrl("http://localhost:3000/", true)
         );
 
         http.logout(logout -> logout
-                .logoutSuccessUrl("/exchange-rates")
+                .logoutSuccessUrl("http://localhost:3000/")
         );
 
         return http.build();

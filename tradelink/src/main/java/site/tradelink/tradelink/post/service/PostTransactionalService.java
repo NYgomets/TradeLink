@@ -1,8 +1,12 @@
 package site.tradelink.tradelink.post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.tradelink.tradelink.comment.repository.CommentRepository;
 import site.tradelink.tradelink.oauth2.entity.Member;
 import site.tradelink.tradelink.oauth2.repository.MemberRepository;
 import site.tradelink.tradelink.post.entity.Post;
@@ -12,6 +16,7 @@ import site.tradelink.tradelink.post.repository.file.UploadFileRepository;
 import site.tradelink.tradelink.post.request.PostCreateDto;
 import site.tradelink.tradelink.post.request.PostUpdateDto;
 import site.tradelink.tradelink.post.response.PostResponseDto;
+import site.tradelink.tradelink.post.response.PostSummaryDto;
 import site.tradelink.tradelink.post.service.file.FileUrlService;
 
 import java.util.HashSet;
@@ -29,6 +34,7 @@ public class PostTransactionalService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final UploadFileRepository uploadFileRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public Long createPostAndMetadata(PostCreateDto request, Long memberSeq) {
@@ -122,5 +128,16 @@ public class PostTransactionalService {
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 없거나 삭제 권한이 없습니다."));
 
         post.softDelete();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSummaryDto> getPosts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return postRepository.findActivePostsWithMember(pageable)
+                .map(post -> {
+                    int commentCount = commentRepository.countByPostSeq(post.getSeq()); // 아래 참고
+                    int fileCount = uploadFileRepository.findByPostSeq(post.getSeq()).size();
+                    return new PostSummaryDto(post, commentCount, fileCount);
+                });
     }
 }
