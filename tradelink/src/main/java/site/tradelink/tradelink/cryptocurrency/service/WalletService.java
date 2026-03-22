@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.cryptocurrency.entity.Wallet;
 import site.tradelink.tradelink.cryptocurrency.repository.WalletRepository;
+import site.tradelink.tradelink.supports.enums.ErrorCode;
+import site.tradelink.tradelink.supports.exception.CustomException;
 
 /**
  * 지갑 서비스
@@ -23,8 +25,7 @@ public class WalletService {
     public void reserve(Long memberSeq, long amount) {
         int updated = walletRepository.reserve(memberSeq, amount);
         if (updated == 0) {
-            throw new IllegalStateException(
-                    "주문 가능 금액이 부족합니다. (요청=" + amount + "원)");
+            throw new CustomException(ErrorCode.INSUFFICIENT_BALANCE);
         }
     }
 
@@ -38,8 +39,7 @@ public class WalletService {
     @Transactional
     public void confirmBuy(Long memberSeq, long reservedAmount, long execAmount) {
         if (execAmount > reservedAmount) {
-            throw new IllegalStateException(
-                    "체결가 상승으로 잔고 부족 (예약=" + reservedAmount + ", 체결=" + execAmount + ")");
+            throw new CustomException(ErrorCode.SLIPPAGE_EXCEEDED);
         }
         long refund = reservedAmount - execAmount;
         walletRepository.confirmBuy(memberSeq, execAmount, refund);

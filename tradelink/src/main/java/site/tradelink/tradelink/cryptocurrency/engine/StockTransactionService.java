@@ -13,6 +13,8 @@ import site.tradelink.tradelink.cryptocurrency.handler.CryptoName;
 import site.tradelink.tradelink.cryptocurrency.repository.HoldingRepository;
 import site.tradelink.tradelink.cryptocurrency.repository.TradeHistoryRepository;
 import site.tradelink.tradelink.cryptocurrency.service.WalletService;
+import site.tradelink.tradelink.supports.enums.ErrorCode;
+import site.tradelink.tradelink.supports.exception.CustomException;
 
 /**
  * 주식 체결 DB 트랜잭션 서비스
@@ -40,8 +42,7 @@ public class StockTransactionService {
         // 매도: 보유 수량 검증 + 차감
         if (OrderSide.SELL == side) {
             Holding holding = holdingRepository.findByMemberSeqAndTicker(memberSeq, ticker)
-                    .orElseThrow(() -> new IllegalStateException(
-                            "보유 수량 없음: " + ticker));
+                    .orElseThrow(() -> new CustomException(ErrorCode.INSUFFICIENT_HOLDING));
 
             holding.sell(quantity);
             if (holding.getQuantity() == 0) {

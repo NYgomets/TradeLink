@@ -9,6 +9,8 @@ import site.tradelink.tradelink.cryptocurrency.entity.OrderEvent;
 import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 import site.tradelink.tradelink.cryptocurrency.repository.OrderEventRepository;
+import site.tradelink.tradelink.supports.enums.ErrorCode;
+import site.tradelink.tradelink.supports.exception.CustomException;
 
 /**
  * 주문 접수 퍼사드 서비스
@@ -27,8 +29,7 @@ public class OrderPlaceService {
 
         // 1. 호가 선검증 (stale 포함)
         long bestPrice = orderBookCache.getBestPrice(req.ticker(), req.side())
-                .orElseThrow(() -> new IllegalStateException(
-                        req.ticker() + " 호가 데이터를 수신 중입니다. 잠시 후 다시 시도해주세요."));
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDERBOOK_STALE));
 
         // 2. 매수: 예약 차감 (availableBalance)
         long reservedAmount = 0L;
