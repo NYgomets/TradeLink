@@ -19,16 +19,12 @@ public class PostSummaryDto {
     private int commentCount;
     private boolean hasFiles;
 
-    /**
-     * 1. LazyInitializationException 주의
-     * 2. N+1 문제 주의
-     */
-    public PostSummaryDto(Post post, int commentCount, int fileCount) {
+    public PostSummaryDto(Post post, int commentCount, boolean hasFiles) {
         this.seq = post.getSeq();
         this.title = post.getTitle();
         this.authorName = post.getMember().getMemberName();
         this.createTime = post.getCreateTime();
         this.commentCount = commentCount;
-        this.hasFiles = fileCount > 0;
+        this.hasFiles = hasFiles;
     }
 }

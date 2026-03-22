@@ -55,4 +55,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     ORDER BY p.createTime DESC
     """)
     Page<Post> findActivePostsWithMember(Pageable pageable);
+
+    @Query("""
+    SELECT p.seq, COUNT(c)
+    FROM Post p
+    LEFT JOIN Comment c ON c.post.seq = p.seq AND c.status = 'ACTIVE'
+    WHERE p.seq IN :postSeqs
+    GROUP BY p.seq
+    """)
+    List<Object[]> countCommentsByPostSeqs(@Param("postSeqs") List<Long> postSeqs);
 }
