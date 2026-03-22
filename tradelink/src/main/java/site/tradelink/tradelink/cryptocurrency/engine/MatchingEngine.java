@@ -8,6 +8,8 @@ import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 import site.tradelink.tradelink.cryptocurrency.service.WalletService;
 import site.tradelink.tradelink.cryptocurrency.sse.SseEmitterManager;
+import site.tradelink.tradelink.supports.enums.ErrorCode;
+import site.tradelink.tradelink.supports.exception.CustomException;
 
 import java.time.LocalDateTime;
 
@@ -42,13 +44,15 @@ public class MatchingEngine {
         // 2. DB 작업 (트랜잭션 범위 최소화)
         try {
             transactionService.process(event, execPrice);
-        } catch (IllegalStateException e) {
+        } catch (CustomException e) {
             log.warn("[Matching] 체결 실패 memberSeq={} ticker={}: {}",
                     memberSeq, ticker, e.getMessage());
 
             // 슬리피지 실패: 트랜잭션 밖에서 예약금 환불
             // (트랜잭션 안에서 환불 시 예외로 인해 환불도 롤백되는 문제 방지)
-            if (OrderSide.BUY.equals(event.getSide()) && event.getReservedPrice() > 0) {
+            if (OrderSide.BUY.equals(event.getSide())
+                    && ErrorCode.SLIPPAGE_EXCEEDED.equals(e.getErrorCode())
+                    && event.getReservedPrice() > 0) {
                 try {
                     walletService.cancelReservation(memberSeq, event.getReservedPrice());
                 } catch (Exception ex) {
