@@ -39,4 +39,12 @@ public interface UploadFileRepository extends JpaRepository<UploadFile, Long> {
     @Modifying
     @Query("DELETE FROM UploadFile f WHERE f.post.seq IN :postSeqs")
     void deleteByPostSeqIn(@Param("postSeqs") List<Long> postSeqs);
+
+    @Query("""
+    SELECT DISTINCT f.post.seq
+    FROM UploadFile f
+    WHERE f.post.seq IN :postSeqs
+    AND f.status = 'ACTIVE'
+    """)
+    Set<Long> findPostSeqsHavingActiveFiles(@Param("postSeqs") List<Long> postSeqs);
 }

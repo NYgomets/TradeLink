@@ -42,7 +42,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c WHERE c.status = 'DELETED' AND c.deletedTime < :cutoffDate " +
             "AND NOT EXISTS (SELECT child FROM Comment child WHERE child.parent = c AND child.status = 'ACTIVE')")
     List<Comment> findPurgableComments(@Param("cutoffDate") LocalDateTime cutoffDate);
-
-    @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.seq = :postSeq AND c.status = 'ACTIVE'")
-    int countByPostSeq(@Param("postSeq") Long postSeq);
 }

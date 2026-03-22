@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.comment.repository.CommentRepository;
 import site.tradelink.tradelink.oauth2.entity.Member;
 import site.tradelink.tradelink.oauth2.repository.MemberRepository;
+import site.tradelink.tradelink.post.common.enums.FileStatus;
 import site.tradelink.tradelink.post.entity.Post;
 import site.tradelink.tradelink.post.entity.UploadFile;
 import site.tradelink.tradelink.post.repository.PostRepository;
@@ -133,11 +134,28 @@ public class PostTransactionalService {
     @Transactional(readOnly = true)
     public Page<PostSummaryDto> getPosts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return postRepository.findActivePostsWithMember(pageable)
-                .map(post -> {
-                    int commentCount = commentRepository.countByPostSeq(post.getSeq()); // 아래 참고
-                    int fileCount = uploadFileRepository.findByPostSeq(post.getSeq()).size();
-                    return new PostSummaryDto(post, commentCount, fileCount);
-                });
+        Page<Post> posts = postRepository.findActivePostsWithMember(pageable);
+
+        List<Long> postSeqs = posts.stream().map(Post::getSeq).toList();
+
+        if (postSeqs.isEmpty()) return posts.map(p -> new PostSummaryDto(p, 0, false));
+
+        // 댓글 수: IN 쿼리 1번
+        Map<Long, Integer> commentCounts = postRepository.countCommentsByPostSeqs(postSeqs)
+                .stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> ((Long) row[1]).intValue()
+                ));
+
+        // 파일 존재 여부: DISTINCT postSeq만 가져옴 (파일 수와 무관하게 경량)
+        Set<Long> postSeqsWithFiles = uploadFileRepository
+                .findPostSeqsHavingActiveFiles(postSeqs);
+
+        return posts.map(post -> new PostSummaryDto(
+                post,
+                commentCounts.getOrDefault(post.getSeq(), 0),
+                postSeqsWithFiles.contains(post.getSeq())
+        ));
     }
 }
