@@ -10,6 +10,7 @@ import site.tradelink.tradelink.cryptocurrency.entity.Wallet;
 import site.tradelink.tradelink.cryptocurrency.inMemory.StockPriceCache;
 import site.tradelink.tradelink.cryptocurrency.repository.HoldingRepository;
 import site.tradelink.tradelink.cryptocurrency.service.WalletService;
+import site.tradelink.tradelink.oauth2.common.principal.CustomOAuth2User;
 import site.tradelink.tradelink.supports.request.ApiResponse;
 
 import java.util.List;
@@ -27,7 +28,9 @@ public class WalletController {
      * 지갑 조회 (현금 잔고)
      */
     @GetMapping
-    public ApiResponse<WalletDto> getWallet(@AuthenticationPrincipal Long memberSeq) {
+    public ApiResponse<WalletDto> getWallet(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+
+        Long memberSeq = customOAuth2User.getMemberSeq();
         Wallet wallet = walletService.getWallet(memberSeq);
         return ApiResponse.ok(WalletDto.from(wallet));
     }
@@ -37,7 +40,9 @@ public class WalletController {
      * 총 자산 = 현금(availableBalance) + 보유 종목 평가액 합계
      */
     @GetMapping("/total-asset")
-    public ApiResponse<TotalAssetDto> getTotalAsset(@AuthenticationPrincipal Long memberSeq) {
+    public ApiResponse<TotalAssetDto> getTotalAsset(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+
+        Long memberSeq = customOAuth2User.getMemberSeq();
         Wallet wallet = walletService.getWallet(memberSeq);
         List<Holding> holdings = holdingRepository.findByMemberSeq(memberSeq);
 
@@ -66,9 +71,10 @@ public class WalletController {
      */
     @PostMapping("/deposit")
     public ApiResponse<WalletDto> deposit(
-            @AuthenticationPrincipal Long memberSeq,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @RequestParam long amount) {
 
+        Long memberSeq = customOAuth2User.getMemberSeq();
         if (amount <= 0 || amount > 100_000_000L) {
             throw new IllegalArgumentException("입금액은 1원 이상 1억원 이하만 가능합니다");
         }

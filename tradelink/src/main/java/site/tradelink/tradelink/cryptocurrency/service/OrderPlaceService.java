@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.tradelink.tradelink.cryptocurrency.dto.OrderRequestDto;
 import site.tradelink.tradelink.cryptocurrency.entity.OrderEvent;
+import site.tradelink.tradelink.cryptocurrency.entity.ProcessorOffset;
 import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 import site.tradelink.tradelink.cryptocurrency.repository.OrderEventRepository;
+import site.tradelink.tradelink.cryptocurrency.repository.ProcessorOffsetRepository;
 import site.tradelink.tradelink.supports.enums.ErrorCode;
 import site.tradelink.tradelink.supports.exception.CustomException;
 
@@ -23,6 +25,7 @@ public class OrderPlaceService {
     private final OrderBookCache orderBookCache;
     private final WalletService        walletService;
     private final OrderEventRepository orderEventRepository;
+    private final ProcessorOffsetRepository processorOffsetRepository;
 
     @Transactional
     public void place(Long memberSeq, OrderRequestDto req) {
@@ -44,5 +47,11 @@ public class OrderPlaceService {
                 OrderEvent.create(memberSeq, req.ticker(), req.side(),
                         req.quantity(), reservedAmount)
         );
+
+        processorOffsetRepository.findByTicker(req.ticker())
+                .orElseGet(() -> {
+                    log.info("[OrderPlace] ProcessorOffset 신규 생성: {}", req.ticker());
+                    return processorOffsetRepository.save(ProcessorOffset.create(req.ticker()));
+                });
     }
 }

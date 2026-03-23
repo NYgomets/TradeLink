@@ -24,7 +24,7 @@ public class StockController {
     private final OrderBookCache orderBookCache;
     private final SseEmitterManager sseManager;
 
-    // 종목 목록 (클라이언트 5초 polling)
+    // 종목 목록
     @GetMapping
     public ApiResponse<List<StockPriceSummaryDto>> getAll() {
         return ApiResponse.ok(
