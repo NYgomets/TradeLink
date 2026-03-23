@@ -25,7 +25,7 @@ public class ExchangeRateScheduler {
     /**
      * 환율 업데이트
      */
-    @Scheduled(cron = "${scheduler.exchange-rate.update-cron:0 */10 * * * MON-FRI}")
+    @Scheduled(cron = "${scheduler.exchange-rate.update-cron:*/10 * * * * MON-FRI}")
     public void updateExchangeRate() {
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             for (Currency currency : Currency.values()) {

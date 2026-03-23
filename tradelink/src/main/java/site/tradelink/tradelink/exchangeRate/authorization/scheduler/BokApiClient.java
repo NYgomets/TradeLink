@@ -24,6 +24,7 @@ public class BokApiClient {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
+    private static final int MAX_FALLBACK_DAYS = 7;
     private final RestClient bokRestClient;
     private final BokApiResponseValidator validator;
 
@@ -31,21 +32,48 @@ public class BokApiClient {
     private String authKey;
 
     /**
-     * 최신 환율 조회 (당일)
+     * 최신 환율 조회
+     * 당일 데이터 없으면 최대 7일 전까지 폴백
      */
     public BokApiExchangeRateDto.Row getLatestExchangeRate(Currency currency) {
         LocalDate today = LocalDate.now();
-        
-        BokApiExchangeRateDto.BokApiExchangeRateResponse response = fetchData(
-                StatisticCode.EXCHANGE_RATE,
-                currency.getItemCode(),
-                today,
-                today
+
+        for (int i = 0; i <= MAX_FALLBACK_DAYS; i++) {
+            LocalDate targetDate = today.minusDays(i);
+
+            BokApiExchangeRateDto.BokApiExchangeRateResponse response = fetchData(
+                    StatisticCode.EXCHANGE_RATE,
+                    currency.getItemCode(),
+                    targetDate,
+                    targetDate
+            );
+
+            if (hasData(response)) {
+                if (i > 0) {
+                    log.info("[BOK] {} 당일 데이터 없음 → {}일 전({}) 데이터 사용",
+                            currency.name(), i, targetDate);
+                }
+                validator.validate(response);
+                return response.getStatisticSearch().getRows().getFirst();
+            }
+        }
+
+        // 7일 이내 데이터가 전혀 없는 경우 (거의 발생하지 않음)
+        throw new RuntimeException(
+                "[BOK] " + currency.name() + " 최근 " + MAX_FALLBACK_DAYS + "일 이내 데이터 없음"
         );
+    }
 
-        validator.validate(response);
-
-        return response.getStatisticSearch().getRows().getFirst();
+    /**
+     * 응답에 실제 데이터가 있는지 확인
+     */
+    private boolean hasData(BokApiExchangeRateDto.BokApiExchangeRateResponse response) {
+        return response != null
+                && response.getStatisticSearch() != null
+                && response.getStatisticSearch().getRows() != null
+                && !response.getStatisticSearch().getRows().isEmpty()
+                && response.getStatisticSearch().getRows().getFirst().getDataValue() != null
+                && !response.getStatisticSearch().getRows().getFirst().getDataValue().isBlank();
     }
 
     /**
