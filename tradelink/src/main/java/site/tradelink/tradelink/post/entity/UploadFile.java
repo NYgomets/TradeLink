@@ -25,6 +25,7 @@ public class UploadFile extends BaseEntity {
 
     private String s3Key;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private FileStatus status = FileStatus.ACTIVE;
 
