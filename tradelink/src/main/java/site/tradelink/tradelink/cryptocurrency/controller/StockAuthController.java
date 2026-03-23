@@ -19,6 +19,7 @@ import site.tradelink.tradelink.cryptocurrency.repository.TradeHistoryRepository
 import site.tradelink.tradelink.cryptocurrency.service.OrderPlaceService;
 import site.tradelink.tradelink.cryptocurrency.service.WalletService;
 import site.tradelink.tradelink.cryptocurrency.sse.SseEmitterManager;
+import site.tradelink.tradelink.oauth2.common.principal.CustomOAuth2User;
 import site.tradelink.tradelink.supports.request.ApiResponse;
 
 import java.util.List;
@@ -43,12 +44,13 @@ public class StockAuthController {
      * 4. 202 Accepted 즉시 반환
      */
     @PostMapping("/orders")
-    public ResponseEntity<ApiResponse<Void>> placeOrder(
-            @AuthenticationPrincipal Long memberSeq,
+    public ApiResponse<Void> placeOrder(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @Valid @RequestBody OrderRequestDto req) {
 
+        Long memberSeq = customOAuth2User.getMemberSeq();
         orderPlaceService.place(memberSeq, req);
-        return ResponseEntity.accepted().body(ApiResponse.ok(null));
+        return ApiResponse.ok(null);
     }
 
     // 내 체결 내역 조회
@@ -57,7 +59,9 @@ public class StockAuthController {
      * SSE 재연결 시 최근 체결 결과 확인용
      */
     @GetMapping("/orders")
-    public ApiResponse<List<TradeHistoryDto>> getMyOrders(@AuthenticationPrincipal Long memberSeq) {
+    public ApiResponse<List<TradeHistoryDto>> getMyOrders(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+
+        Long memberSeq = customOAuth2User.getMemberSeq();
         return ApiResponse.ok(
                 tradeHistoryRepository.findByMemberSeqOrderByCreateTimeDesc(memberSeq)
                         .stream()
@@ -74,9 +78,10 @@ public class StockAuthController {
      */
     @GetMapping(value = "/sse/orders", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeToMyOrders(
-            @AuthenticationPrincipal Long memberSeq,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @RequestParam(required = false) String clientId) {
 
+        Long memberSeq = customOAuth2User.getMemberSeq();
         if (clientId == null || clientId.isBlank()) clientId = UUID.randomUUID().toString();
         return sseManager.connectMember(memberSeq, clientId);
     }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import site.tradelink.tradelink.cryptocurrency.dto.HoldingDto;
 import site.tradelink.tradelink.cryptocurrency.repository.HoldingRepository;
+import site.tradelink.tradelink.oauth2.common.principal.CustomOAuth2User;
 import site.tradelink.tradelink.supports.request.ApiResponse;
 
 import java.util.List;
@@ -23,7 +24,8 @@ public class HoldingAuthController {
      * 내 보유 주식 목록
      */
     @GetMapping
-    public ApiResponse<List<HoldingDto>> getMyHoldings(@AuthenticationPrincipal Long memberSeq) {
+    public ApiResponse<List<HoldingDto>> getMyHoldings(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+        Long memberSeq = customOAuth2User.getMemberSeq();
         return ApiResponse.ok(
                 holdingRepository.findByMemberSeq(memberSeq)
                         .stream()
@@ -37,8 +39,9 @@ public class HoldingAuthController {
      */
     @GetMapping("/{ticker}")
     public ApiResponse<HoldingDto> getHolding(
-            @AuthenticationPrincipal Long memberSeq,
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
             @PathVariable String ticker) {
+        Long memberSeq = customOAuth2User.getMemberSeq();
         return ApiResponse.ok(
                 holdingRepository.findByMemberSeqAndTicker(memberSeq, ticker)
                         .map(HoldingDto::from)
