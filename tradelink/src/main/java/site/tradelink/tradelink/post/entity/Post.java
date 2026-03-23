@@ -37,6 +37,7 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UploadFile> uploadFiles = new ArrayList<>();
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private PostStatus status = PostStatus.ACTIVE;
 

@@ -24,6 +24,7 @@ public class Comment extends BaseEntity {
 
     private String content;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private CommentStatus status = CommentStatus.ACTIVE;
 

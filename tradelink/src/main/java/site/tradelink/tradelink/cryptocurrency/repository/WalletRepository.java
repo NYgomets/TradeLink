@@ -60,7 +60,7 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
      * 원자적 매도 체결 확정
      * balance + availableBalance 모두 증가
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
             UPDATE Wallet w
             SET w.balance = w.balance + :execAmount,
