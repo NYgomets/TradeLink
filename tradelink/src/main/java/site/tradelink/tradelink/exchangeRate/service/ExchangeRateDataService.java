@@ -46,14 +46,14 @@ public class ExchangeRateDataService {
      * CurrentExchangeRate 업데이트
      */
     private CurrentExchangeRate updateCurrentRate(Currency currency, Double rate, LocalDateTime dateTime) {
-        Optional<CurrentExchangeRate> optional = currentRepository.findByCurrencyCode(currency.getItemCode());
+        Optional<CurrentExchangeRate> optional = currentRepository.findByCurrencyCode(currency.getCurrencyCode());
 
         CurrentExchangeRate current;
         Double previous = null;
 
         if (optional.isEmpty()) {
             current = CurrentExchangeRate.builder()
-                    .currencyCode(currency.getItemCode())
+                    .currencyCode(currency.getCurrencyCode())
                     .currencyName(currency.getKoreanName())
                     .rate(rate)
                     .baseDateTime(dateTime)
@@ -76,7 +76,7 @@ public class ExchangeRateDataService {
      */
     private void saveHistory(Currency currency, Double rate, LocalDateTime dateTime) {
         ExchangeRate history = ExchangeRate.builder()
-                .currencyCode(currency.getItemCode())
+                .currencyCode(currency.getCurrencyCode())
                 .rate(rate)
                 .baseDateTime(dateTime)
                 .build();

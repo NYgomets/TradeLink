@@ -91,10 +91,15 @@ public class ExchangeRateService {
     }
 
     private int parsePeriod(String period) {
-        try {
-            return Integer.parseInt(period);
-        } catch (NumberFormatException e) {
-            return 1; // 기본값 당일 조회
-        }
+        if (period == null) return 1;
+        return switch (period.toUpperCase()) {
+            case "1D" -> 1;
+            case "1W" -> 7;
+            case "1M" -> 30;
+            case "3M" -> 90;
+            case "6M" -> 180;
+            case "1Y" -> 365;
+            default -> 1;
+        };
     }
 }
