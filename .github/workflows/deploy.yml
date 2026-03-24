@@ -46,9 +46,9 @@ jobs:
       - name: EC2 서버로 JAR 파일 전송
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          host: ${{ secrets.DEV_SERVER_EC2_HOST }}
+          username: ${{ secrets.DEV_SERVER_EC2_USERNAME }}
+          key: ${{ secrets.DEV_SERVER_EC2_PRIVATE_KEY }}
           # 위에서 루트로 꺼내온 jar 파일을 전송합니다.
           source: "server-tradelink.jar"
           target: "/home/ubuntu/server-tradelink/tobe"
