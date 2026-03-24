@@ -16,7 +16,7 @@ jobs:
       - name: JDK 25버전 설치
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: 'temurin'
           java-version: '25'
 
       - name: Gradle 캐싱
@@ -25,18 +25,23 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle','**/*.gradle-wrapper.properties') }}
+          # hashFiles 경로에 프로젝트 폴더명 추가
+          key: ${{ runner.os }}-gradle-${{ hashFiles('tradelink/**/*.gradle*', 'tradelink/**/*.gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle
 
       - name: gradlew 실행 권한 부여
+        # 실행 경로를 프로젝트 폴더 안으로 지정
         run: chmod +x ./gradlew
+        working-directory: ./tradelink
 
       - name: 백엔드 jar 빌드
         run: ./gradlew build
+        working-directory: ./tradelink
 
       - name: 빌드된 JAR 파일 이름 변경
-        run: mv ./build/libs/*SNAPSHOT.jar ./server-tradelink.jar
+        # 빌드 결과물은 tradelink/build/libs 아래에 생성됩니다.
+        run: mv ./tradelink/build/libs/*SNAPSHOT.jar ./server-tradelink.jar
 
       - name: EC2 서버로 JAR 파일 전송
         uses: appleboy/scp-action@v0.1.7
@@ -44,8 +49,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: server-tradelink.jar
-          target: /home/ubuntu/server-tradelink/tobe
+          # 위에서 루트로 꺼내온 jar 파일을 전송합니다.
+          source: "server-tradelink.jar"
+          target: "/home/ubuntu/server-tradelink/tobe"
 
       - name: SSH로 EC2에 접속 후 애플리케이션 실행
         uses: appleboy/ssh-action@v1.0.3
@@ -56,7 +62,7 @@ jobs:
           script_stop: true
           script: |
             rm -rf /home/ubuntu/server-tradelink/current
-            mkdir /home/ubuntu/server-tradelink/current
+            mkdir -p /home/ubuntu/server-tradelink/current
             mv /home/ubuntu/server-tradelink/tobe/server-tradelink.jar /home/ubuntu/server-tradelink/current/server-tradelink.jar
             cd /home/ubuntu/server-tradelink/current
             sudo fuser -k -n tcp 17771 || true    
