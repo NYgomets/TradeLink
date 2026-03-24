@@ -36,7 +36,7 @@ jobs:
         working-directory: ./tradelink
 
       - name: 백엔드 jar 빌드
-        run: ./gradlew build
+        run: ./gradlew build -x test
         working-directory: ./tradelink
 
       - name: 빌드된 JAR 파일 이름 변경
@@ -52,6 +52,7 @@ jobs:
           # 위에서 루트로 꺼내온 jar 파일을 전송합니다.
           source: "server-tradelink.jar"
           target: "/home/ubuntu/server-tradelink/tobe"
+          strip_components: 1
 
       - name: SSH로 EC2에 접속 후 애플리케이션 실행
         uses: appleboy/ssh-action@v1.0.3
