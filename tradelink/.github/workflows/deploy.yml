@@ -1,0 +1,64 @@
+name: SERVER DEPLOY
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Github Repository 에서 파일 불러 오기
+        uses: actions/checkout@v4
+
+      - name: JDK 25버전 설치
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Gradle 캐싱
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle','**/*.gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle
+
+      - name: gradlew 실행 권한 부여
+        run: chmod +x ./gradlew
+
+      - name: 백엔드 jar 빌드
+        run: ./gradlew build
+
+      - name: 빌드된 JAR 파일 이름 변경
+        run: mv ./build/libs/*SNAPSHOT.jar ./server-tradelink.jar
+
+      - name: EC2 서버로 JAR 파일 전송
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: server-tradelink.jar
+          target: /home/ubuntu/server-tradelink/tobe
+
+      - name: SSH로 EC2에 접속 후 애플리케이션 실행
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            rm -rf /home/ubuntu/server-tradelink/current
+            mkdir /home/ubuntu/server-tradelink/current
+            mv /home/ubuntu/server-tradelink/tobe/server-tradelink.jar /home/ubuntu/server-tradelink/current/server-tradelink.jar
+            cd /home/ubuntu/server-tradelink/current
+            sudo fuser -k -n tcp 17771 || true    
+            nohup java -Duser.timezone=Asia/Seoul -jar server-tradelink.jar > ./output.log 2>&1 &
+            rm -rf /home/ubuntu/server-tradelink/tobe
