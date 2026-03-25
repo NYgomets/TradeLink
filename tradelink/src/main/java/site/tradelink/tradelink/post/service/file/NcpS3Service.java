@@ -17,7 +17,7 @@ public class NcpS3Service {
 
     private final S3Client s3Client;
 
-    @Value("${cloud.ncp.s3.bucket}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     public void deleteFiles(List<String> s3Keys) {

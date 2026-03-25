@@ -19,13 +19,13 @@ public class PresignedUrlService {
 
     private final S3Presigner s3Presigner;
 
-    @Value("${cloud.ncp.s3.bucket}")
+    @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("${cloud.ncp.s3.presign.upload-expire-seconds}")
+    @Value("${cloud.aws.s3.presign.upload-expire-seconds}")
     private long uploadExpireSeconds;
 
-    @Value("${cloud.ncp.s3.presign.download-expire-seconds}")
+    @Value("${cloud.aws.s3.presign.download-expire-seconds}")
     private long downloadExpireSeconds;
 
     /**

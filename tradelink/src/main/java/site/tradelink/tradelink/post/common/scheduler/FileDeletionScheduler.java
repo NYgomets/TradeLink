@@ -26,7 +26,7 @@ public class FileDeletionScheduler {
     private final FileDeletionTransactionalService fileDeletionTransactionalService;
     private final ApplicationEventPublisher eventPublisher;
 
-    @Value("${cloud.ncp.s3.path.postPhoto}")
+    @Value("${cloud.aws.s3.path.postPhoto}")
     private String postPhotoPath;
 
     private static final int S3_BULK_DELETE_LIMIT = 1000;
