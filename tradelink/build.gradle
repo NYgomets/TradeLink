@@ -74,7 +74,7 @@ dependencies {
     // WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-    implementation "io.awspring.cloud:spring-cloud-aws-starter-parameter-store:3.4.0"
+    implementation "io.awspring.cloud:spring-cloud-aws-starter-parameter-store:4.0.0"
 }
 
 tasks.named('test') {
