@@ -8,7 +8,7 @@ import java.util.UUID;
 @Component
 public class S3KeyGenerator {
 
-    @Value("${cloud.ncp.s3.path.postPhoto}")
+    @Value("${cloud.aws.s3.path.postPhoto}")
     private String postPhotoPath;
 
      public String generatePostPhotoKey(String originalFilename) {
