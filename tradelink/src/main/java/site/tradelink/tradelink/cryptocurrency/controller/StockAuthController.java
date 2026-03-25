@@ -2,15 +2,22 @@ package site.tradelink.tradelink.cryptocurrency.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import site.tradelink.tradelink.cryptocurrency.dto.CursorPageResponse;
 import site.tradelink.tradelink.cryptocurrency.dto.OrderRequestDto;
 import site.tradelink.tradelink.cryptocurrency.dto.TradeHistoryDto;
 import site.tradelink.tradelink.cryptocurrency.entity.Holding;
 import site.tradelink.tradelink.cryptocurrency.entity.OrderEvent;
+import site.tradelink.tradelink.cryptocurrency.entity.TradeHistory;
 import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 import site.tradelink.tradelink.cryptocurrency.repository.HoldingRepository;
@@ -59,15 +66,27 @@ public class StockAuthController {
      * SSE 재연결 시 최근 체결 결과 확인용
      */
     @GetMapping("/orders")
-    public ApiResponse<List<TradeHistoryDto>> getMyOrders(@AuthenticationPrincipal CustomOAuth2User customOAuth2User) {
+    public ApiResponse<CursorPageResponse<TradeHistoryDto>> getMyOrders(
+            @AuthenticationPrincipal CustomOAuth2User customOAuth2User,
+            @RequestParam(required = false) Long cursorSeq,    // 마지막으로 본 seq
+            @RequestParam(defaultValue = "20") int size) {
 
         Long memberSeq = customOAuth2User.getMemberSeq();
-        return ApiResponse.ok(
-                tradeHistoryRepository.findByMemberSeqOrderByCreateTimeDesc(memberSeq)
-                        .stream()
-                        .map(TradeHistoryDto::from)
-                        .toList()
-        );
+        Pageable pageable = PageRequest.of(0, size); // page는 항상 0
+
+        Slice<TradeHistory> slice = (cursorSeq == null)
+                ? tradeHistoryRepository.findByMemberSeqOrderBySeqDesc(memberSeq, pageable)
+                : tradeHistoryRepository.findByMemberSeqAndSeqLessThanOrderBySeqDesc(memberSeq, cursorSeq, pageable);
+
+        List<TradeHistoryDto> content = slice.getContent()
+                .stream().map(TradeHistoryDto::from).toList();
+
+        // 다음 커서 = 현재 배치의 마지막 seq
+        Long nextCursor = slice.hasNext()
+                ? content.get(content.size() - 1).seq()
+                : null;
+
+        return ApiResponse.ok(new CursorPageResponse<>(content, nextCursor, slice.hasNext()));
     }
 
     // SSE 개인 알림 구독
