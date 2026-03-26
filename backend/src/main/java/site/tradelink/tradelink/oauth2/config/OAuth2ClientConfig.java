@@ -65,11 +65,11 @@ public class OAuth2ClientConfig {
                         authorizationEndpointConfig -> authorizationEndpointConfig
                                 .authorizationRequestResolver(customAuthorizationRequestResolver)
                 )
-                .defaultSuccessUrl("http://localhost:3000/", true)
+                .defaultSuccessUrl("https://tradelink-alpha.vercel.app/", true)
         );
 
         http.logout(logout -> logout
-                .logoutSuccessUrl("http://localhost:3000/")
+                .logoutSuccessUrl("https://tradelink-alpha.vercel.app/")
         );
 
         return http.build();
