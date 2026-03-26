@@ -65,11 +65,11 @@ public class OAuth2ClientConfig {
                         authorizationEndpointConfig -> authorizationEndpointConfig
                                 .authorizationRequestResolver(customAuthorizationRequestResolver)
                 )
-                .defaultSuccessUrl("https://tradelink-alpha.vercel.app/", true)
+                .defaultSuccessUrl("https://www.gomets.store", true)
         );
 
         http.logout(logout -> logout
-                .logoutSuccessUrl("https://tradelink-alpha.vercel.app/")
+                .logoutSuccessUrl("https://www.gomets.store")
         );
 
         return http.build();
