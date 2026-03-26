@@ -8,7 +8,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:17771',
+        target: 'https://server.gomets.store',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
