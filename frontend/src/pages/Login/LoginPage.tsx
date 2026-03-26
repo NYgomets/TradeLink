@@ -16,7 +16,7 @@ export default function LoginPage() {
           
             href={`${BACKEND_URL}/oauth2/authorization/google`}
             className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl border border-border hover:border-text-muted hover:bg-bg-hover transition-all text-sm text-text-primary"
-          >
+          <a>
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -29,7 +29,7 @@ export default function LoginPage() {
           
             href={`${BACKEND_URL}/oauth2/authorization/kakao`}
             className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl bg-[#FEE500] hover:bg-[#f0d800] transition-all text-sm text-[#3C1E1E] font-medium"
-          >
+          <a>
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#3C1E1E">
               <path d="M12 3C6.48 3 2 6.69 2 11.25c0 2.91 1.87 5.47 4.71 6.97l-1.2 4.47 5.19-3.44c.42.06.85.09 1.3.09 5.52 0 10-3.69 10-8.25C22 6.69 17.52 3 12 3z"/>
             </svg>
@@ -39,7 +39,7 @@ export default function LoginPage() {
           
             href={`${BACKEND_URL}/oauth2/authorization/naver`}
             className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl bg-[#03C75A] hover:bg-[#02b350] transition-all text-sm text-white font-medium"
-          >
+          <a>
             <span className="font-bold text-base leading-none">N</span>
             네이버로 계속하기
           </a>
