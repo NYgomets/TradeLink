@@ -26,22 +26,22 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           # hashFiles 경로에 프로젝트 폴더명 추가
-          key: ${{ runner.os }}-gradle-${{ hashFiles('tradelink/**/*.gradle*', 'tradelink/**/*.gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('backend/**/*.gradle*', 'backend/**/*.gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle
 
       - name: gradlew 실행 권한 부여
         # 실행 경로를 프로젝트 폴더 안으로 지정
         run: chmod +x ./gradlew
-        working-directory: ./tradelink
+        working-directory: ./backend
 
       - name: 백엔드 jar 빌드
         run: ./gradlew build -x test
-        working-directory: ./tradelink
+        working-directory: ./backend
 
       - name: 빌드된 JAR 파일 이름 변경
-        # 빌드 결과물은 tradelink/build/libs 아래에 생성됩니다.
-        run: mv ./tradelink/build/libs/*SNAPSHOT.jar ./server-tradelink.jar
+        # 빌드 결과물은 backend/build/libs 아래에 생성됩니다.
+        run: mv ./backend/build/libs/*SNAPSHOT.jar ./server-tradelink.jar
 
       - name: EC2 서버로 JAR 파일 전송
         uses: appleboy/scp-action@v0.1.7
