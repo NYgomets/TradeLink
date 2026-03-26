@@ -8,6 +8,8 @@ const NAV = [
   { label: '커뮤니티', path: '/posts' },
 ]
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+
 export default function Header() {
   const { pathname } = useLocation()
   const { member, isLoggedIn, logout } = useAuthStore()
@@ -62,19 +64,19 @@ export default function Header() {
           ) : (
             <div className="flex gap-2">
               <a
-                href="http://localhost:17771/oauth2/authorization/google"
+                href={`${BACKEND_URL}/oauth2/authorization/google`}
                 className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border border-border text-text-secondary hover:text-text-primary hover:border-accent-cyan/40 transition-all"
               >
                 Google
               </a>
               <a
-                href="http://localhost:17771/oauth2/authorization/kakao"
+                href={`${BACKEND_URL}/oauth2/authorization/kakao`}
                 className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded bg-[#FEE500] text-[#3C1E1E] font-medium hover:bg-[#f0d800] transition-all"
               >
                 Kakao
               </a>
               <a
-                href="http://localhost:17771/oauth2/authorization/naver"
+                href={`${BACKEND_URL}/oauth2/authorization/naver`}
                 className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded bg-[#03C75A] text-white font-medium hover:bg-[#02b350] transition-all"
               >
                 Naver

@@ -1,3 +1,5 @@
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+
 export default function LoginPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center">
@@ -11,8 +13,8 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-bg-card border border-border rounded-2xl p-6 flex flex-col gap-3">
-          <a
-            href="http://localhost:17771/oauth2/authorization/google"
+          
+            href={`${BACKEND_URL}/oauth2/authorization/google`}
             className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl border border-border hover:border-text-muted hover:bg-bg-hover transition-all text-sm text-text-primary"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -24,8 +26,8 @@ export default function LoginPage() {
             Google로 계속하기
           </a>
 
-          <a
-            href="http://localhost:17771/oauth2/authorization/kakao"
+          
+            href={`${BACKEND_URL}/oauth2/authorization/kakao`}
             className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl bg-[#FEE500] hover:bg-[#f0d800] transition-all text-sm text-[#3C1E1E] font-medium"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#3C1E1E">
@@ -34,8 +36,8 @@ export default function LoginPage() {
             카카오로 계속하기
           </a>
 
-          <a
-            href="http://localhost:17771/oauth2/authorization/naver"
+          
+            href={`${BACKEND_URL}/oauth2/authorization/naver`}
             className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-xl bg-[#03C75A] hover:bg-[#02b350] transition-all text-sm text-white font-medium"
           >
             <span className="font-bold text-base leading-none">N</span>

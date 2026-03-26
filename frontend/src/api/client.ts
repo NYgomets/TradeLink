@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 const client = axios.create({
-  baseURL: '/api',
-  withCredentials: true, // 세션 쿠키 포함
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
