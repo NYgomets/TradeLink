@@ -101,6 +101,12 @@ management:
 server:
   port: 17771
   address: 0.0.0.0
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: true
+        http-only: true
 
 scheduler:
   order:
