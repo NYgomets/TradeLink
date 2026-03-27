@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface DailyExchangeRateRepository extends JpaRepository<DailyExchangeRate, Long>, DailyExchangeRateCustomRepository {
     boolean existsByCurrencyCodeAndBaseDate(String currencyCode, LocalDate baseDate);
 
-    Optional<DailyExchangeRate> findByCurrencyCodeAndBaseDate(String currencyCode, LocalDate baseDate);
+    Optional<DailyExchangeRate> findTopByCurrencyCodeAndBaseDateBeforeOrderByBaseDateDesc(String currencyCode, LocalDate today);
 }
