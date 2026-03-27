@@ -31,8 +31,18 @@ public class OAuth2ClientConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        http.cors(cors -> cors.configure(http));
+
+        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        csrfTokenRepository.setCookieCustomizer(cookie ->
+                cookie.sameSite("None")
+                        .secure(true)
+                        .path("/")
+                        .domain("gomets.store")
+                );
+
         http.csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRepository(csrfTokenRepository)
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
         );
 
