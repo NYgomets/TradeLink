@@ -38,7 +38,7 @@ public class OAuth2ClientConfig {
                 cookie.sameSite("None")
                         .secure(true)
                         .path("/")
-                        .domain(".gomets.store")
+                        .domain("gomets.store")
                 );
 
         http.csrf(csrf -> csrf
