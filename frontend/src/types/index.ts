@@ -80,8 +80,8 @@ export interface StockPriceSummaryDto {
   ticker: string
   name: string
   price: number
-  changeRate: number
-  changePrice: number
+  changePercent: number
+  changeAmount: number
   volume: number
 }
 

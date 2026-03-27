@@ -59,7 +59,7 @@ export default function StockDetailPage() {
     )
   }
 
-  const isUp = (price?.changeRate ?? 0) >= 0
+  const isUp = (price?.changePercent ?? 0) >= 0
 
   return (
     <div className="animate-fade-up">
@@ -107,8 +107,8 @@ export default function StockDetailPage() {
                       isUp ? 'text-accent-green' : 'text-accent-red'
                     }`}
                   >
-                    {isUp ? '▲' : '▼'} {Math.abs(price?.changePrice ?? 0).toLocaleString()} (
-                    {price?.changeRate?.toFixed(2)}%)
+                    {isUp ? '▲' : '▼'} {Math.abs(price?.changeAmount ?? 0).toLocaleString()} (
+                    {price?.changePercent?.toFixed(2)}%)
                   </span>
                 </div>
               </div>
