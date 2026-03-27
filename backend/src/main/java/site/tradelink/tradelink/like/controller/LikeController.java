@@ -23,7 +23,9 @@ public class LikeController {
      */
     @GetMapping("/posts/{postSeq}")
     public ApiResponse<LikeStatusResponseDto> getLikeStatus(@AuthenticationPrincipal CustomOAuth2User customOAuth2User, @PathVariable Long postSeq) {
-        Long memberSeq = customOAuth2User.getMemberSeq();
+
+        Long memberSeq = (customOAuth2User != null) ? customOAuth2User.getMemberSeq() : null;
+
         LikeStatusResponseDto response = likeQueryService.getLikeStatus(memberSeq, postSeq);
         return ApiResponse.ok(response);
     }
