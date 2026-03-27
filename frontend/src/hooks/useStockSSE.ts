@@ -17,7 +17,7 @@ export function useStockSSE(ticker: string | null): UseStockSSEResult {
     if (!ticker) return
 
     const clientId = `client-${Date.now()}`
-    const url = `/api/stocks/sse/${ticker}?clientId=${clientId}`
+    const url = `${import.meta.env.VITE_API_BASE_URL}/stocks/sse/${ticker}?clientId=${clientId}`
     const es = new EventSource(url, { withCredentials: true })
     esRef.current = es
 

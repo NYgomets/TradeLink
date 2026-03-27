@@ -35,7 +35,7 @@ function subscribeSSE() {
   if (esInstance) return
 
   const clientId = `order-${Date.now()}`
-  const url = `/api/auth/stocks/sse/orders?clientId=${clientId}`
+  const url = `${import.meta.env.VITE_API_BASE_URL}/auth/stocks/sse/orders?clientId=${clientId}`
   esInstance = new EventSource(url, { withCredentials: true })
 
   esInstance.addEventListener('my-order', (e) => {
