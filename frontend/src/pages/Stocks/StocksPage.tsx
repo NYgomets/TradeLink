@@ -70,7 +70,7 @@ export default function StocksPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {stocks.map((stock) => {
             // ✅ 수정 1: animationDelay 제거 → 카드 전체가 즉시 렌더링됨
-            const isUp = stock.changeRate >= 0
+            const isUp = stock.changePercent >= 0
             const flash = flashing[stock.ticker]
             return (
               <div
@@ -100,7 +100,7 @@ export default function StocksPage() {
                         : 'bg-accent-red/15 text-accent-red'
                     }`}
                   >
-                    {isUp ? '+' : ''}{stock.changeRate?.toFixed(2)}%
+                    {isUp ? '+' : ''}{stock.changePercent?.toFixed(2)}%
                   </span>
                 </div>
 
@@ -111,7 +111,7 @@ export default function StocksPage() {
 
                 <div className="flex items-center justify-between mt-2">
                   <span className={`font-mono text-xs ${isUp ? 'text-accent-green' : 'text-accent-red'}`}>
-                    {isUp ? '▲' : '▼'} {Math.abs(stock.changePrice).toLocaleString()}
+                    {isUp ? '▲' : '▼'} {Math.abs(stock.changeAmount).toLocaleString()}
                   </span>
                   <span className="text-xs text-text-muted">
                     거래량 {stock.volume?.toLocaleString() ?? '-'}

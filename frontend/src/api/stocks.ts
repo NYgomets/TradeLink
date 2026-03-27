@@ -1,5 +1,5 @@
 import client from './client'
-import type { StockPriceSummaryDto, OrderBookDto, TradeHistoryDto, PageResponse } from '../types'
+import type { StockPriceSummaryDto, OrderBookDto, TradeHistoryDto, CursorPageResponse } from '../types'
 
 export const stocksApi = {
   getAll: () =>
