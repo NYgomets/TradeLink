@@ -42,19 +42,4 @@ public class DailyExchangeRate extends BaseEntity {
 
     @Column
     private LocalDate baseDate;
-
-    /**
-     * CurrentExchangeRate로부터 생성
-     */
-    public static DailyExchangeRate fromCurrent(CurrentExchangeRate current, LocalDate baseDate) {
-        return DailyExchangeRate.builder()
-                .currencyCode(current.getCurrencyCode())
-                .currencyName(current.getCurrencyName())
-                .rate(current.getRate())
-                .changeAmount(current.getChangeAmount())
-                .changePercent(current.getChangePercent())
-                .baseDate(baseDate)
-                .build();
-    }
-
 }

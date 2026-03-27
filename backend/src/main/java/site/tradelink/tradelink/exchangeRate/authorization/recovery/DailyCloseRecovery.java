@@ -13,6 +13,10 @@ import site.tradelink.tradelink.exchangeRate.service.ExchangeRateDataService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Component
@@ -25,32 +29,42 @@ public class DailyCloseRecovery implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        LocalDateTime start = yesterday.atStartOfDay();
-        LocalDateTime end = yesterday.atTime(23, 59, 59);
 
-        // 주말/공휴일 체크 - 어떤 통화든 하나라도 있으면 영업일로 판단
-        boolean hasYesterdayData = Arrays.stream(Currency.values())
-                .anyMatch(currency ->
-                        historyRepository.existsByCurrencyCodeAndBaseDateTimeBetween(
-                                currency.getCurrencyCode(), start, end)
-                );
+        // 최근 7일 안에서 가장 최근 영업일 찾기 (공휴일/휴일 대응)
+        LocalDate targetDate = IntStream.rangeClosed(1, 7)
+                .mapToObj(i -> LocalDate.now().minusDays(i))
+                .filter(date -> {
+                    LocalDateTime s = date.atStartOfDay();
+                    LocalDateTime e = date.atTime(23, 59, 59);
+                    return Arrays.stream(Currency.values()).anyMatch(c ->
+                            historyRepository.existsByCurrencyCodeAndBaseDateTimeBetween(
+                                    c.getCurrencyCode(), s, e));
+                })
+                .findFirst()
+                .orElse(null);
 
-        if (!hasYesterdayData) {
-            log.info("어제({}) 환율 데이터 없음 (휴일 추정) → 복구 스킵", yesterday);
+        if (targetDate == null) {
+            log.info("최근 7일간 환율 데이터 없음 → 복구 스킵");
             return;
         }
 
-        // 종가 누락 체크 - 하나라도 없으면 복구 실행
-        boolean allExists = Arrays.stream(Currency.values())
-                .allMatch(currency ->
-                        dailyRepository.existsByCurrencyCodeAndBaseDate(
-                                currency.getCurrencyCode(), yesterday)
-                );
+        Set<String> savedCodes = Arrays.stream(Currency.values())
+                .filter(c -> dailyRepository.existsByCurrencyCodeAndBaseDate(
+                        c.getCurrencyCode(), targetDate))
+                .map(Currency::getCurrencyCode)
+                .collect(Collectors.toSet());
 
-        if (!allExists) {
-            log.info("어제({}) 종가 누락 감지 → 자동 복구 실행", yesterday);
-            dataService.recoverDailyClosingRates(yesterday);
+        // 누락된 통화만 필터링
+        List<Currency> missingCurrencies = Arrays.stream(Currency.values())
+                .filter(c -> !savedCodes.contains(c.getCurrencyCode()))
+                .toList();
+
+        if (missingCurrencies.isEmpty()) {
+            log.info("최근 영업일({}) 종가 모두 존재 → 복구 스킵", targetDate);
+            return;
         }
+
+        log.info("최근 영업일({}) 종가 누락 감지 {} → 자동 복구 실행", targetDate, missingCurrencies);
+        dataService.recoverDailyClosingRates(targetDate, missingCurrencies);
     }
 }
