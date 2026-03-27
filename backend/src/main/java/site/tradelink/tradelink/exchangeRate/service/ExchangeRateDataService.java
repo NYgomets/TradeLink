@@ -14,6 +14,7 @@ import site.tradelink.tradelink.exchangeRate.repository.ExchangeRateRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,5 +102,39 @@ public class ExchangeRateDataService {
                 // 이미 저장된 데이터 무시
             }
         }
+    }
+
+    // 복구용 - 특정 날짜 히스토리 기반으로 종가 저장
+    @Transactional
+    public void recoverDailyClosingRates(LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.atTime(23, 59, 59);
+
+        Arrays.stream(Currency.values()).forEach(currency -> {
+            historyRepository
+                    .findTopByCurrencyCodeAndBaseDateTimeBetweenOrderByBaseDateTimeDesc(
+                            currency.getCurrencyCode(), start, end)
+                    .ifPresent(history -> {
+                        DailyExchangeRate prevDay = dailyRepository
+                                .findByCurrencyCodeAndBaseDate(currency.getCurrencyCode(), date.minusDays(1))
+                                .orElse(null);
+
+                        Double changeAmount = prevDay != null ? history.getRate() - prevDay.getRate() : null;
+                        Double changePercent = prevDay != null ? (changeAmount / prevDay.getRate()) * 100 : null;
+
+                        DailyExchangeRate daily = DailyExchangeRate.builder()
+                                .currencyCode(history.getCurrencyCode())
+                                .currencyName(currency.getKoreanName())
+                                .rate(history.getRate())
+                                .changeAmount(changeAmount)
+                                .changePercent(changePercent)
+                                .baseDate(date)
+                                .build();
+                        try {
+                            dailyRepository.save(daily);
+                        } catch (DataIntegrityViolationException ignored) {
+                        }
+                    });
+        });
     }
 }
