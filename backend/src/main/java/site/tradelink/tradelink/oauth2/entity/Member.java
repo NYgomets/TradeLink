@@ -23,6 +23,6 @@ public class Member {
 
     private String provider;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String email;
 }

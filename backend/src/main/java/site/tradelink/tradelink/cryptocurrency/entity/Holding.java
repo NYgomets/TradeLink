@@ -3,6 +3,8 @@ package site.tradelink.tradelink.cryptocurrency.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import site.tradelink.tradelink.supports.entity.BaseEntity;
+import site.tradelink.tradelink.supports.enums.ErrorCode;
+import site.tradelink.tradelink.supports.exception.CustomException;
 
 /**
  * 보유 주식
@@ -42,9 +44,7 @@ public class Holding extends BaseEntity {
 
     public void sell(double qty) {
         if (qty > this.quantity) {
-            throw new IllegalStateException(
-                    "보유 수량 부족: " + this.ticker
-                            + " (보유=" + this.quantity + ", 요청=" + qty + ")");
+            throw new CustomException(ErrorCode.INSUFFICIENT_HOLDING);
         }
         this.quantity -= qty;
     }

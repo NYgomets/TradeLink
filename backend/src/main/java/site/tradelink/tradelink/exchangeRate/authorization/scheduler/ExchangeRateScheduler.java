@@ -44,7 +44,7 @@ public class ExchangeRateScheduler {
     /**
      * 종가 저장
      */
-    @Scheduled(cron = "${scheduler.exchange-rate.daily-close-cron:0 0 19 * * MON-FRI}")
+    @Scheduled(cron = "${scheduler.exchange-rate.daily-close-cron:0 0 23 * * MON-FRI}")
     public void saveDailyClosingRates() {
         try {
             dataService.saveDailyClosingRates();
