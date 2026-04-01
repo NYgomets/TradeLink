@@ -41,7 +41,11 @@ export default function ExchangeRatePage() {
       try {
         const data = await exchangeRateApi.getLatest()
         setRates(data)
-        if (!selected && data.length > 0) setSelected(data[0])
+        setSelected(prev => {
+          if (!prev) return data[0] ?? null
+          // 선택된 통화의 최신 데이터로 업데이트
+          return data.find(r => r.currencyCode === prev.currencyCode) ?? prev
+        })
       } catch {
       } finally {
         setLoadingRates(false)
