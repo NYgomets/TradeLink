@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.tradelink.tradelink.cryptocurrency.disruptor.OrderEventDisruptorEngine;
 import site.tradelink.tradelink.cryptocurrency.dto.OrderRequestDto;
 import site.tradelink.tradelink.cryptocurrency.entity.OrderEvent;
-import site.tradelink.tradelink.cryptocurrency.entity.ProcessorOffset;
 import site.tradelink.tradelink.cryptocurrency.enums.OrderSide;
 import site.tradelink.tradelink.cryptocurrency.inMemory.OrderBookCache;
 import site.tradelink.tradelink.cryptocurrency.repository.OrderEventRepository;
-import site.tradelink.tradelink.cryptocurrency.repository.ProcessorOffsetRepository;
 import site.tradelink.tradelink.supports.enums.ErrorCode;
 import site.tradelink.tradelink.supports.exception.CustomException;
 
@@ -23,14 +22,17 @@ import site.tradelink.tradelink.supports.exception.CustomException;
 public class OrderPlaceService {
 
     private final OrderBookCache orderBookCache;
-    private final WalletService        walletService;
-    private final OrderEventRepository orderEventRepository;
-    private final ProcessorOffsetRepository processorOffsetRepository;
+    private final WalletService walletService;
+    private final OrderEventDisruptorEngine disruptorEngine;
 
     @Transactional
     public void place(Long memberSeq, OrderRequestDto req) {
 
-        // 1. 호가 선검증 (stale 포함)
+        if (memberSeq == null || req == null) {
+            throw new CustomException(ErrorCode.WALLET_NOT_FOUND);
+        }
+
+        // 1. 호가 선검증
         long bestPrice = orderBookCache.getBestPrice(req.ticker(), req.side())
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDERBOOK_STALE));
 
@@ -42,16 +44,12 @@ public class OrderPlaceService {
         }
 
         // 3. OrderEvent INSERT
-        // reserve() 와 같은 트랜잭션 → save() 실패 시 reserve()도 롤백
-        orderEventRepository.save(
-                OrderEvent.create(memberSeq, req.ticker(), req.side(),
-                        req.quantity(), reservedAmount)
+        disruptorEngine.publish(
+                memberSeq,
+                req.ticker(),
+                req.side(),
+                req.quantity(),
+                reservedAmount
         );
-
-        processorOffsetRepository.findByTicker(req.ticker())
-                .orElseGet(() -> {
-                    log.info("[OrderPlace] ProcessorOffset 신규 생성: {}", req.ticker());
-                    return processorOffsetRepository.save(ProcessorOffset.create(req.ticker()));
-                });
     }
 }
